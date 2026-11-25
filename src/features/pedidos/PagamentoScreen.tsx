@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { userMessage } from '@/api/errors';
@@ -10,7 +10,7 @@ import { FormMessage } from '@/components/FormMessage';
 import { OptionCard } from '@/components/OptionCard';
 import { Screen } from '@/components/Screen';
 import { formatCents, formatPeriod } from '@/lib/format';
-import { idempotencyKey } from '@/lib/randomId';
+import { useIdempotencyKey } from '@/lib/useIdempotencyKey';
 import { useFiltro } from '@/features/explorar/FiltroProvider';
 import { useCotacao, useVaga } from '@/features/explorar/hooks';
 import { vagaTitulo } from '@/features/explorar/VagaCard';
@@ -40,13 +40,16 @@ export function PagamentoScreen() {
   );
   const [erroLocal, setErroLocal] = useState<string | null>(null);
 
-  // Mesma chave em todas as tentativas deste envio; muda se o conteúdo mudar
-  // (senão o backend responde `idempotency_key_reused`).
-  const key = useMemo(
-    () => idempotencyKey(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- a chave depende só do conteúdo do pedido.
-    [metodo, vagaId, filtro.modalidade, filtro.quantidade, filtro.inicio, veiculo?.id],
-  );
+  // Mesma chave nas novas tentativas deste envio; nova se mudar vaga, veículo,
+  // período, modalidade ou forma de pagamento (D10).
+  const key = useIdempotencyKey({
+    vagaId,
+    veiculoId: veiculo?.id ?? null,
+    modalidade: filtro.modalidade,
+    quantidade: filtro.quantidade,
+    inicio: filtro.inicio,
+    metodo,
+  });
 
   if (!vaga.data || !cotacao.data) {
     return (

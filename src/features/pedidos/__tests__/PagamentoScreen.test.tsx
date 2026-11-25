@@ -16,15 +16,16 @@ jest.mock('react-native-safe-area-context', () => {
 });
 jest.mock('@/features/explorar/hooks', () => ({ useVaga: jest.fn(), useCotacao: jest.fn() }));
 jest.mock('@/features/veiculos/useVeiculoEscolhido', () => ({ useVeiculoEscolhido: jest.fn() }));
-jest.mock('@/features/explorar/FiltroProvider', () => ({
-  useFiltro: () => ({ modalidade: 'dia', quantidade: 3, inicio: '2099-11-12T21:00:00.000Z', veiculoId: 'c1' }),
-}));
+const filtro = { modalidade: 'dia', quantidade: 3, inicio: '2099-11-12T21:00:00.000Z', veiculoId: 'c1' };
+let mockFiltro = { ...filtro };
+jest.mock('@/features/explorar/FiltroProvider', () => ({ useFiltro: () => mockFiltro }));
 jest.mock('../hooks', () => ({ useCriarPedido: jest.fn() }));
 
 const mutate = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockFiltro = { ...filtro };
   (useVaga as jest.Mock).mockReturnValue({
     data: {
       id: 'v1',
@@ -77,6 +78,24 @@ describe('PagamentoScreen', () => {
     expect(keys[0]).toBe(keys[1]);
     expect(keys[2]).not.toBe(keys[0]);
     expect(mutate.mock.calls[2][0].body).toMatchObject({ forma_pagamento: 'cartao', cartao_token: expect.stringMatching(/^tok_dev_/) });
+  });
+
+  it('mudar período, modalidade ou veículo gera chave nova', async () => {
+    const { rerender } = await render(<PagamentoScreen />);
+    await fireEvent.press(screen.getByRole('radio', { name: 'Pix' }));
+    const enviar = () => fireEvent.press(screen.getByRole('button', { name: /Enviar pedido/ }));
+    await enviar();
+    mockFiltro = { ...mockFiltro, inicio: '2099-11-13T21:00:00.000Z' };
+    await rerender(<PagamentoScreen />);
+    await enviar();
+    mockFiltro = { ...mockFiltro, modalidade: 'semana' };
+    await rerender(<PagamentoScreen />);
+    await enviar();
+    (useVeiculoEscolhido as jest.Mock).mockReturnValue({ veiculo: { id: 'c2', modelo: 'Y', porte: 'G' } });
+    await rerender(<PagamentoScreen />);
+    await enviar();
+    const keys = mutate.mock.calls.map((c) => c[0].key);
+    expect(new Set(keys).size).toBe(4);
   });
 
   it('textos de quando cobra no modo manual', async () => {
