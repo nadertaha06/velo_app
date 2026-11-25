@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Anunciar vaga: fotos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Archivo,system-ui,sans-serif}
+a{color:#0e0e0e}a:hover{color:#000}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #ffffff; color: #0e0e0e; display: flex; flex-direction: column; overflow: hidden; font-family: Archivo, sans-serif">
+<div style="padding: 52px 20px 0; display: flex; flex-direction: column; gap: 18px; flex: 1">
+<div style="display: flex; align-items: center; gap: 12px">
+<a href="Main.dc.html" aria-label="Voltar" style="width: 44px; height: 44px; border-radius: 22px; background: #f1f1ef; display: flex; align-items: center; justify-content: center; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; color: #4a4a47; font-weight: 600">Anunciar vaga · passo 2 de 4</span>
+<h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em">Fotos da vaga</h1>
+</div>
+</div>
+<div style="padding: 16px; border-radius: 18px; background: #0e0e0e; color: #ffffff; display: flex; flex-direction: column; gap: 10px">
+<span style="font-weight: 800; font-size: 16px">Fotografe só a vaga vazia</span>
+<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.4; color: #e6e6e3">
+<li>Sem carros, nem o seu nem o dos vizinhos</li>
+<li>Sem placas visíveis</li>
+<li>Sem pessoas</li>
+</ul>
+<span style="font-size: 12px; color: #c9c9c4; line-height: 1.4">Fotos com placas ou pessoas podem ser removidas pelo síndico.</span>
+</div>
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.4; cursor: pointer">
+<input type="checkbox" checked style="margin: 2px 0 0; width: 20px; height: 20px; accent-color: #0e0e0e; flex: none">
+<span>Entendi. Minhas fotos mostram só a vaga vazia.</span>
+</label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="aspect-ratio: 1; border-radius: 14px; background: repeating-linear-gradient(135deg,#e2e2de 0 6px,#ebebe7 6px 12px); display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box"><span style="font-size: 11px; font-weight: 700; background: #ffffff; padding: 3px 7px; border-radius: 6px">Capa</span></div>
+<button style="aspect-ratio: 1; border-radius: 14px; border: 1.5px dashed #a8a8a3; background: #fafaf8; color: #0e0e0e; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v12H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>Adicionar foto</button>
+</div>
+<span style="font-size: 12px; color: #4a4a47">1 de 4 fotos · a localização e outros dados da foto são removidos.</span>
+</div>
+<div style="padding: 14px 20px 28px; border-top: 1px solid #eeeeec">
+<button style="width: 100%; padding: 16px; border-radius: 16px; border: none; background: #D6F33A; color: #0e0e0e; font-weight: 800; font-size: 15px">Continuar</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Detalhe da vaga</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Archivo,system-ui,sans-serif}
+a{color:#0e0e0e}a:hover{color:#000}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #ffffff; color: #0e0e0e; display: flex; flex-direction: column; overflow: hidden; font-family: Archivo, sans-serif">
+<div style="height: 220px; flex: none; background: repeating-linear-gradient(135deg,#e2e2de 0 8px,#ebebe7 8px 16px); position: relative; display: flex; align-items: flex-end; justify-content: flex-end; padding: 14px; box-sizing: border-box">
+<a href="Main.dc.html" aria-label="Voltar" style="position: absolute; top: 52px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+<span style="font: 500 11px 'JetBrains Mono', monospace; color: #4a4a47; background: #ffffff; padding: 4px 8px; border-radius: 6px">foto 1/4</span>
+</div>
+<div style="padding: 18px 20px 0; display: flex; flex-direction: column; gap: 14px; flex: 1; overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: flex-start">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -0.03em">Vaga 47 · Subsolo 1</h1>
+<span style="font-size: 13px; color: #5f5f5c">Coberta · 2,50 × 5,00 × 2,10 m · cabe até G</span>
+</div>
+</div>
+<div style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: #f6f6f3">
+<div style="width: 40px; height: 40px; border-radius: 20px; background: #0e0e0e; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex: none">RF</div>
+<div style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+<span style="font-weight: 700; font-size: 14px">Rafael · Ap. 112</span>
+<span style="font-size: 12px; color: #4a4a47">Aprova manualmente · responde em até 4h</span>
+</div>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Prazo de resposta"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700">Modalidade</span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<button style="padding: 10px 0; border-radius: 12px; border: 2px solid #0e0e0e; background: #ffffff; color: #0e0e0e; font-size: 13px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 2px">R$ 25<span style="font-weight: 500; font-size: 11px">dia</span></button>
+<button style="padding: 10px 0; border-radius: 12px; border: 1.5px solid #e6e6e3; background: #ffffff; color: #0e0e0e; font-size: 13px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 2px">R$ 150<span style="font-weight: 500; font-size: 11px; color: #5f5f5c">semana</span></button>
+<button style="padding: 10px 0; border-radius: 12px; border: 1.5px solid #e6e6e3; background: #ffffff; color: #0e0e0e; font-size: 13px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 2px">R$ 420<span style="font-weight: 500; font-size: 11px; color: #5f5f5c">mês</span></button>
+<button disabled style="padding: 10px 0; border-radius: 12px; border: 1.5px dashed #d9d9d5; background: #fafaf8; color: #5f5f5c; font-size: 13px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px">—<span style="font-weight: 500; font-size: 11px">ano: off</span></button>
+</div>
+</div>
+<div style="display: flex; gap: 8px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+<label for="inicio" style="font-size: 13px; font-weight: 700">Início</label>
+<input id="inicio" value="12 nov, 18:00" style="padding: 12px; border-radius: 12px; border: 1.5px solid #e6e6e3; font-family: inherit; font-size: 14px; font-weight: 600; color: #0e0e0e; min-width: 0">
+</div>
+<div style="width: 132px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700">Diárias</span>
+<div style="display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #e6e6e3; border-radius: 12px; height: 46px; padding: 0 2px">
+<button aria-label="Menos uma diária" style="width: 40px; height: 40px; border: none; background: transparent; font-size: 20px; font-weight: 700; color: #0e0e0e">−</button>
+<span style="font-weight: 800; font-size: 16px">3</span>
+<button aria-label="Mais uma diária" style="width: 40px; height: 40px; border: none; background: transparent; font-size: 20px; font-weight: 700; color: #0e0e0e">+</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; color: #4a4a47">Termina em <b style="color: #0e0e0e">15 nov, 18:00</b></span>
+<div style="display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; border: 1.5px solid #0e0e0e">
+<span style="font-size: 13px; line-height: 1.4; flex: 1">A partir de 7 dias, a <b>semana</b> (R$ 150) sai mais barata que as diárias (R$ 175).</span>
+</div>
+</div>
+<div style="padding: 14px 20px 28px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #eeeeec">
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 20px; font-weight: 900">R$ 75</span>
+<span style="font-size: 11px; color: #5f5f5c">3 diárias</span>
+</div>
+<a href="Pagamento.dc.html" style="flex: 1; padding: 16px; border-radius: 16px; background: #D6F33A; text-align: center; font-weight: 800; font-size: 15px; color: #0e0e0e; text-decoration: none">Pedir vaga</a>
+</div>
+<span style="font-size: 12px; color: #4a4a47; text-align: center">Você só é cobrado se o Rafael aprovar.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

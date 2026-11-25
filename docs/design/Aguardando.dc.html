@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Aguardando aprovação</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Archivo,system-ui,sans-serif}
+a{color:#0e0e0e}a:hover{color:#000}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #ffffff; color: #0e0e0e; display: flex; flex-direction: column; overflow: hidden; font-family: Archivo, sans-serif">
+<div style="padding: 56px 20px 0; display: flex; flex-direction: column; gap: 18px; flex: 1">
+<span style="font-size: 12px; color: #4a4a47; font-weight: 600">Pedido enviado</span>
+<h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15">Aguardando o Rafael responder</h1>
+<div style="padding: 20px; border-radius: 20px; background: #0e0e0e; color: #ffffff; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; color: #c9c9c4">Ele tem até</span>
+<span style="font-size: 40px; font-weight: 900; letter-spacing: -0.03em; color: #D6F33A">3h 42min</span>
+<span style="font-size: 13px; color: #e6e6e3">Hoje, até 15:42. Se não responder, o pedido expira e nada é cobrado.</span>
+<div style="height: 6px; border-radius: 3px; background: #2e2e2c; overflow: hidden"><div style="width: 8%; height: 6px; background: #D6F33A"></div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px; background: #f6f6f3; font-size: 13px">
+<div style="display: flex; justify-content: space-between"><span style="color: #4a4a47">Vaga</span><span style="font-weight: 700">47 · Subsolo 1</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #4a4a47">Período</span><span style="font-weight: 700">12 nov 18h → 15 nov 18h</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #4a4a47">Veículo</span><span style="font-weight: 700">Honda Fit · M</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #4a4a47">Pagamento</span><span style="font-weight: 700">Apple Pay · R$ 75,00</span></div>
+</div>
+<div style="display: flex; gap: 10px; align-items: flex-start">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<span style="font-size: 13px; line-height: 1.45; color: #2e2e2c">R$ 75,00 estão reservados no seu cartão, mas <b>ainda não foram cobrados</b>. Ao aprovar, você recebe a foto e o local exato da vaga.</span>
+</div>
+</div>
+<div style="padding: 14px 20px 28px; display: flex; flex-direction: column; gap: 10px">
+<button style="padding: 16px; border-radius: 16px; border: 1.5px solid #0e0e0e; background: #ffffff; color: #0e0e0e; font-weight: 700; font-size: 15px">Cancelar pedido</button>
+<span style="font-size: 12px; color: #4a4a47; text-align: center">Cancelar agora não tem custo.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
