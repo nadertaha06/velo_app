@@ -3,6 +3,7 @@ import createClient from 'openapi-fetch';
 import { createSession } from '@/auth/session';
 import { pendingEmail } from '@/features/auth/pendingEmail';
 import { apiUrl } from '@/lib/config';
+import { recordServerDate } from '@/lib/serverClock';
 
 import { createAuthFetch } from './authFetch';
 import { ApiError, toApiError } from './errors';
@@ -19,9 +20,17 @@ export const session = createSession({
   },
 });
 
+/** `fetch` que anota a hora do servidor (cabeçalho `Date`) de cada resposta. */
+async function fetchComRelogio(req: Request): Promise<Response> {
+  const sentAt = Date.now();
+  const res = await fetch(req);
+  recordServerDate(res.headers.get('date'), sentAt, Date.now());
+  return res;
+}
+
 export const api = createClient<paths>({
   baseUrl: apiUrl(),
-  fetch: createAuthFetch(session, (req) => fetch(req)),
+  fetch: createAuthFetch(session, fetchComRelogio),
 });
 
 /**

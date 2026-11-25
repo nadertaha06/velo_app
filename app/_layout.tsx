@@ -6,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { setupAppFocus } from '@/api/appFocus';
 import { session } from '@/api/client';
 import { queryClient } from '@/api/queryClient';
 import { useSessionStatus } from '@/auth/useSession';
@@ -13,6 +14,7 @@ import { OfflineScreen } from '@/features/auth/OfflineScreen';
 import { fontAssets } from '@/theme/fonts';
 
 void SplashScreen.preventAutoHideAsync();
+setupAppFocus();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(fontAssets);
