@@ -215,3 +215,77 @@ nunca é mostrado.
 - **Tipos das rotas** (`.expo/types`, fora do git): são gerados quando o
   `npx expo start` roda. Se o `tsc` reclamar de uma rota nova, rode o
   `expo start` uma vez.
+
+## 2026-11-25 — antes da etapa 3
+
+### D13. Cancelamento (backend `feat/etapa-6@f89c479`, D72 dele)
+- **D11 substituída:** `useCancelarPedido(pedidoId)` chama
+  `POST .../pedidos/{p}/cancelar`. O botão pede confirmação e explica a regra
+  em texto, sem valor: antes do início volta o pago menos a taxa, depois do
+  início não há reembolso, e sem cobrança nada é cobrado. O valor devolvido
+  aparece depois, vindo de `reembolso_centavos`. O app não calcula reembolso.
+- O botão aparece nos estados que o backend aceita para quem alugou
+  (`aguardando_dono`, `aguardando_pix`, `confirmado`, `em_uso`).
+- **404 ao cancelar:** só quem fez o pedido cancela. Outro morador da unidade vê
+  o pedido, mas recebe 404, e o app mostra "Só quem fez o pedido pode
+  cancelar". O app ainda não sabe, antes de tentar, se o pedido é da pessoa.
+  Falta no backend: um campo como `feito_por_mim` no `PedidoFeitoOut` (ver D16).
+- `pedidosApi.cancelarRecebido` já existe para a tela do responsável (etapa 3).
+  A rota do admin não é usada: o app não tem papel de admin.
+- **Pagamento e estornos:** o app nunca leu o status do pagamento, e o
+  `PedidoFeitoOut` não o expõe. Por isso a saída de `estorno_pendente` e
+  `estornado` (migração 0009) não muda nada aqui.
+
+### D14. Token de cartão falso: flag de build
+- O gerador (`src/payments/devToken.ts`) só é carregado num
+  `if (__DEV__) { require(...) }` em `provisorio.ts`. O Metro troca `__DEV__`
+  por constante no bundle e remove o ramo morto no build de produção. Precisa
+  ser o `__DEV__` literal no `if`: uma constante importada de outro módulo não
+  é eliminada.
+- **Prova:** `npm run test:prod-bundle` gera o bundle de produção (sem bytecode)
+  e falha se `tok_dev_`, `devCardToken` ou `payments/devToken` estiverem nele.
+  Controle negativo feito: trocando `__DEV__` por `true`, o script falha.
+- **Fora de dev no backend:** o `FakeGateway` aceita qualquer token, menos
+  `tok_recusado` e `tok_indisponivel`, em `dev` e `test`. Em `prod` o backend
+  nem sobe com `PAYMENT_BACKEND=fake` (D65 dele). Ou seja, o fake não recusa um
+  token falso; quem garante é não existir fake em prod. Um gateway real recusaria
+  um token que ele não emitiu.
+
+### D15. Prazo pelo relógio do servidor; polling
+- Cada resposta da API traz o cabeçalho `Date`. `src/lib/serverClock.ts` guarda
+  a diferença para o relógio do aparelho (comparando com o meio da requisição),
+  e o `Countdown` do pedido usa `serverNow()`. O prazo (o instante) já vinha do
+  backend.
+- **Polling:** a cada 15 s só em `aguardando_dono` e `aguardando_pix`, e para nos
+  demais estados. `setupAppFocus` liga o foco do TanStack Query ao `AppState`: em
+  segundo plano o intervalo para, e ao voltar o pedido é buscado na hora
+  (`refetchOnWindowFocus: 'always'`).
+
+### D16. Membro e os pedidos da unidade
+- **O que a spec manda:** o membro vê "as reservas feitas pela unidade e as
+  reservas da vaga da unidade" e aluga "com o próprio pagamento". Não aprova,
+  não recusa e não cancela como dono. O backend (D61 e D72) acrescenta: na
+  unidade de quem aluga, cada um vê a placa e o Pix copia e cola só do próprio
+  pedido, e só quem fez o pedido o cancela.
+- **O que o app faz:** "Minhas reservas" lista os pedidos da unidade inteira
+  (subtítulo "Pedidos feitos pela sua unidade"). A placa só aparece quando a
+  API devolve. Sem o copia e cola, a tela de Pix diz que o pagamento é de quem
+  fez o pedido. Cancelar um pedido de outro morador dá 404, com mensagem clara.
+- **Lacuna:** o botão "Cancelar pedido" aparece também nos pedidos de outros
+  moradores, porque a API não diz de quem é o pedido. Pedido ao backend: campo
+  `feito_por_mim: bool` (ou equivalente) em `PedidoFeitoOut`. Com ele, o app
+  esconde o botão e separa "meus" de "da unidade".
+
+### D17. Scripts de verificação
+- `npm run check:api-drift`: gera o OpenAPI do backend, direto do código em
+  `../velo_backend`, sem servidor, ou de `OPENAPI_URL`, e compara com
+  `src/api/schema.d.ts`. Falha se divergir e mostra o commit do backend usado.
+- `npm run test:prod-bundle`: D14.
+- `npm run test:e2e`: ponta a ponta com o código do app contra um backend de dev
+  com o `seed-dev` (ver `e2e/README.md`). Roda em Node puro, com
+  `EXPO_PUBLIC_USE_RN_FETCH=1` para manter o `fetch` do Node. No aparelho, o
+  `expo/fetch` recebe o `Request` do polyfill `whatwg-fetch` do React Native,
+  que guarda o corpo em `_bodyInit`, e o `expo/fetch` lê esse campo. No jest
+  com o preset do Expo, o `Request` era o do Node, e por isso só lá dava
+  "Unsupported BodyInit type". **Ainda vale conferir no iPhone um POST com corpo
+  (login).**
