@@ -47,7 +47,9 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "gen:api": "openapi-typescript ${OPENAPI_URL:-http://localhost:8000/openapi.json} -o src/api/schema.d.ts",
-    "check": "tsc --noEmit && eslint . && jest"
+    "check": "tsc --noEmit && eslint . && jest",
+    "check:api-drift": "bash scripts/check-api-drift.sh",
+    "test:prod-bundle": "bash scripts/check-prod-bundle.sh"
   },
   "private": true,
   "overrides": {
