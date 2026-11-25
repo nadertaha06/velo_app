@@ -17,7 +17,7 @@ const toneColor: Record<Tone, string> = {
   default: colors.ink,
   muted: colors.textMuted,
   subtle: colors.textSubtle,
-  danger: colors.danger,
+  danger: colors.dangerText,
   onInk: colors.onInk,
 };
 

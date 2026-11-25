@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { userMessage } from '@/api/errors';
 import { AppText } from '@/components/AppText';
+import { VeloLogo } from '@/components/brand/VeloLogo';
 import { Button } from '@/components/Button';
 import { DevLinkField } from '@/components/DevLinkField';
 import { FormMessage } from '@/components/FormMessage';
@@ -44,7 +45,7 @@ export function RegisterScreen() {
   });
 
   return (
-    <Screen title="Criar conta">
+    <Screen title="Criar conta" header={<VeloLogo />}>
       <AppText tone="muted">
         O cadastro é feito a partir do convite que você recebeu do síndico ou do responsável da
         unidade. Abra o link do convite neste celular.

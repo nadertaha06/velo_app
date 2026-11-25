@@ -6,10 +6,10 @@ import { colors, spacing } from '@/theme/tokens';
 
 import { AppText } from './AppText';
 
-type Props = { title?: string; subtitle?: string; children: ReactNode };
+type Props = { title?: string; subtitle?: string; header?: ReactNode; children: ReactNode };
 
 /** Tela com área segura, rolagem e teclado. Rolagem garante fonte grande sem cortar. */
-export function Screen({ title, subtitle, children }: Props) {
+export function Screen({ title, subtitle, header, children }: Props) {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
@@ -17,6 +17,7 @@ export function Screen({ title, subtitle, children }: Props) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          {header}
           {subtitle ? (
             <AppText variant="caption" weight={500} tone="subtle">
               {subtitle}

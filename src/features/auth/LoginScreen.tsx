@@ -6,6 +6,7 @@ import { View } from 'react-native';
 
 import { isApiError, userMessage } from '@/api/errors';
 import { AppText } from '@/components/AppText';
+import { VeloLogo } from '@/components/brand/VeloLogo';
 import { Button } from '@/components/Button';
 import { FormMessage } from '@/components/FormMessage';
 import { Screen } from '@/components/Screen';
@@ -35,7 +36,7 @@ export function LoginScreen() {
   const error = login.error && !isApiError(login.error, 'email_not_verified') ? userMessage(login.error) : null;
 
   return (
-    <Screen title="Entrar" subtitle="Velo">
+    <Screen title="Entrar" header={<VeloLogo />}>
       <AppText tone="muted">Use o e-mail e a senha da sua conta.</AppText>
       <FormMessage message={error} />
       <Controller
