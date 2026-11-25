@@ -863,6 +863,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos/{pedido_id}/cancelar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancelar Feito
+         * @description Quem fez o pedido cancela. Antes do início: volta total - taxa; depois, nada.
+         */
+        post: operations["cancelar_feito_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__cancelar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos/{pedido_id}": {
         parameters: {
             query?: never;
@@ -948,6 +968,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos-recebidos/{pedido_id}/cancelar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancelar Recebido
+         * @description O dono cancela uma reserva confirmada, até 24 h (dia) ou 3 dias (semana, mês,
+         *     ano) antes do início. Reembolso integral; conta para a suspensão da vaga.
+         */
+        post: operations["cancelar_recebido_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__cancelar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/condominios/{condominio_id}/portaria/placas": {
         parameters: {
             query?: never;
@@ -959,6 +1000,26 @@ export interface paths {
         get: operations["placas_do_dia_condominios__condominio_id__portaria_placas_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/pedidos/{pedido_id}/cancelar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancelar Como Admin
+         * @description Só o admin da plataforma: o desbloqueio do cancelamento fora do prazo do dono.
+         */
+        post: operations["cancelar_como_admin_admin_pedidos__pedido_id__cancelar_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1355,6 +1416,23 @@ export interface components {
             unidade: components["schemas"]["UnidadeOut"] | null;
         };
         /**
+         * PedidoCanceladoAdminOut
+         * @description Resposta da rota do admin: só o resultado do cancelamento.
+         */
+        PedidoCanceladoAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Cancelado Por */
+            cancelado_por: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
+        };
+        /**
          * PedidoFeitoOut
          * @description Visão de quem aluga (e da unidade dele).
          */
@@ -1403,6 +1481,12 @@ export interface components {
              */
             created_at: string;
             veiculo: components["schemas"]["VeiculoPedidoOut"] | null;
+            /** Cancelado Em */
+            cancelado_em: string | null;
+            /** Cancelado Por */
+            cancelado_por: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
             dono: components["schemas"]["UnidadeResumoOut"];
             /** Pix Copia Cola */
             pix_copia_cola: string | null;
@@ -1490,6 +1574,12 @@ export interface components {
              */
             created_at: string;
             veiculo: components["schemas"]["VeiculoPedidoOut"] | null;
+            /** Cancelado Em */
+            cancelado_em: string | null;
+            /** Cancelado Por */
+            cancelado_por: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
             locatario: components["schemas"]["UnidadeResumoOut"];
         };
         /** PeriodoOut */
@@ -1746,6 +1836,8 @@ export interface components {
             aviso_foto: string;
             /** No Ar */
             no_ar: boolean;
+            /** Suspensa Ate */
+            suspensa_ate: string | null;
             /** Disponibilidades */
             disponibilidades: components["schemas"]["PeriodoOut"][];
             /** Fotos */
@@ -3761,6 +3853,39 @@ export interface operations {
             };
         };
     };
+    cancelar_feito_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__cancelar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PedidoFeitoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     ver_feito_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__get: {
         parameters: {
             query?: never;
@@ -3925,6 +4050,39 @@ export interface operations {
             };
         };
     };
+    cancelar_recebido_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__cancelar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PedidoRecebidoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     placas_do_dia_condominios__condominio_id__portaria_placas_get: {
         parameters: {
             query?: never;
@@ -3943,6 +4101,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlacaAutorizadaOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancelar_como_admin_admin_pedidos__pedido_id__cancelar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PedidoCanceladoAdminOut"];
                 };
             };
             /** @description Validation Error */
