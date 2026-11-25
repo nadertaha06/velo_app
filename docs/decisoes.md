@@ -137,3 +137,81 @@ nunca é mostrado.
     5,66:1 com `bg`) para texto. Texto branco pequeno sobre `danger` daria
     3,88:1 e fica proibido.
   - Os contrastes são verificados em `src/theme/__tests__/tokens.test.ts`.
+
+## 2026-11-25 — etapa 2
+
+### D9. Explorar: filtro por veículo e período
+- **O backend ainda não filtra.** `GET /condominios/{c}/vagas` não aceita
+  parâmetro: devolve todas as vagas no ar. "O veículo cabe" (porte P < M < G) e
+  "o período está dentro da disponibilidade" são regras do backend (D61 dele),
+  então o app **não** as reimplementa para filtrar a lista (spec do app, seção 10).
+- **O que a lista faz hoje:** esconde só o que o próprio backend já marca: vagas
+  da minha unidade (`da_minha_unidade`) e vagas sem a modalidade escolhida (preço
+  `null`). O texto é "N vagas anunciadas · confira porte e período no detalhe", e
+  não "cabem no seu carro" como na tela de referência.
+- **Para onde vão o veículo e o período:** a escolha alimenta a cotação e o
+  pedido. Se o veículo não couber ou o período não estiver disponível, a resposta
+  do backend aparece na tela.
+- **Pedido para o backend:** aceitar em `GET /vagas` os parâmetros `veiculo_id`,
+  `modalidade`, `quantidade` e `inicio` (os mesmos da cotação), e devolver só as
+  vagas em que o veículo cabe e o período cabe na disponibilidade. Com isso a
+  lista passa a filtrar e o texto volta a ser o da referência.
+
+### D10. Pagamento provisório (`src/payments/`)
+- **Interface `PaymentProvider`:** `metodos()`, `disponivel(metodo)` e
+  `preparar(metodo)`. O SDK do gateway entra atrás dela.
+- **Implementação provisória:**
+  - Pix: não leva token.
+  - Cartão e Apple Pay: o backend exige `cartao_token` (D65 dele). Sem SDK, em
+    dev o app gera `tok_dev_<aleatório>`, que o `FakeGateway` aceita, só para
+    exercitar o fluxo.
+  - Fora de dev, cartão e Apple Pay aparecem desabilitados ("em breve").
+  - Apple Pay só aparece no iOS e vai como `cartao`.
+- **Textos de quando cada forma cobra** (`src/payments/labels.ts`): seguem a D65
+  do backend. No manual, o cartão reserva e só cobra na aprovação, e o Pix só é
+  gerado na aprovação. No automático, a cobrança é na criação. "Até 15 minutos"
+  para o Pix vem do prazo do backend (`min(agora + 15 min, início)`).
+- **`Idempotency-Key`:** gerada na tela de pagamento. É a mesma em todas as
+  tentativas do mesmo envio e muda se mudar o conteúdo (forma, período, vaga,
+  veículo). Sem isso, o backend responderia `idempotency_key_reused`. O formato
+  é `<tempo base36>_<22 aleatórios>`, com `crypto.getRandomValues` quando o
+  runtime tem e `Math.random` quando não tem. A chave precisa ser única por
+  pessoa, não secreta.
+- **Mensagem para o dono** (`mensagem` em `PedidoIn`): fica fora por enquanto,
+  porque nem a spec do app nem as telas a pedem.
+
+### D11. Cancelar pedido
+- A rota ainda não existe no backend (etapa 6 dele).
+  `useCancelarPedido()` (`src/features/pedidos/hooks.ts`) devolve
+  `{ disponivel: false }`, e a tela mostra "Cancelar pedido (em breve)"
+  desabilitado, com um aviso.
+- **Quando a rota existir:** `gen:api` e implementar a chamada nesse hook. A
+  tela já está pronta para usar o `disponivel` e a mutação.
+
+### D12. Navegação e telas da etapa 2
+- **Gate:** `(app)/_layout` só mostra o app depois de resolver o vínculo (D2).
+  Abaixo dele ficam as abas Explorar, Reservas e Perfil e, por cima delas, o
+  detalhe da vaga, o pagamento, o pedido, o filtro (modal) e o novo veículo
+  (modal).
+- **Perfil provisório:** vínculo ativo, troca de vínculo, aceitar convite e sair
+  (o que era a tela de início da etapa 1). O resto do Perfil é da etapa 4.
+- **Vínculo sem unidade** (síndico, portaria): Explorar e Reservas explicam que
+  alugar é para quem mora numa unidade. A tela da portaria é da etapa 4.
+- **Filtro:** fica só em memória (modalidade, quantidade, início e veículo) e
+  zera ao trocar de vínculo. O início é escolhido com dias (60 a partir de hoje)
+  e horas cheias no fuso de São Paulo, com componentes próprios, sem biblioteca
+  de date picker. A conversão de fuso usa o `Intl` (`fromLocalParts`), sem offset
+  fixo.
+- **Veículo:** com um só, ele é usado direto. Com vários, a pessoa escolhe; nunca
+  "o primeiro da lista". O cadastro mínimo (placa, modelo, porte) existe para dar
+  para pedir vaga. Editar e apagar ficam no Perfil (etapa 4).
+- **Pedido em andamento:** consulta o backend a cada 15 s enquanto o pedido
+  espera o dono ou o Pix. O contador é só visual: ao zerar, a tela consulta de
+  novo, e o estado mostrado é sempre o do backend.
+- **Pix copia e cola:** texto selecionável (tocar e segurar para copiar). Um
+  botão "Copiar" exigiria o `expo-clipboard`, que não está na lista de
+  dependências.
+- **Placa:** aparece no pedido só quando a API devolve.
+- **Tipos das rotas** (`.expo/types`, fora do git): são gerados quando o
+  `npx expo start` roda. Se o `tsc` reclamar de uma rota nova, rode o
+  `expo start` uma vez.
