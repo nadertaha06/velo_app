@@ -49,7 +49,8 @@
     "gen:api": "openapi-typescript ${OPENAPI_URL:-http://localhost:8000/openapi.json} -o src/api/schema.d.ts",
     "check": "tsc --noEmit && eslint . && jest",
     "check:api-drift": "bash scripts/check-api-drift.sh",
-    "test:prod-bundle": "bash scripts/check-prod-bundle.sh"
+    "test:prod-bundle": "bash scripts/check-prod-bundle.sh",
+    "test:e2e": "jest -c jest.e2e.config.js --runInBand"
   },
   "private": true,
   "overrides": {
@@ -64,6 +65,10 @@
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|lucide-react-native|react-native-svg|openapi-fetch)"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/e2e/"
     ]
   }
 }

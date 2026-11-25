@@ -9,7 +9,7 @@ jest.mock('expo-secure-store', () => {
     __store: store,
   };
 });
-process.env.EXPO_PUBLIC_API_URL = 'http://localhost:8000';
+process.env.EXPO_PUBLIC_API_URL ??= 'http://localhost:8000';
 
 // lucide é ESM puro (.mjs); nos testes, cada ícone vira um View simples.
 jest.mock('lucide-react-native', () => {

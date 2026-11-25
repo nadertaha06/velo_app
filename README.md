@@ -66,3 +66,9 @@ npx jest
 ```
 
 (`npm run check` roda as três.)
+
+Outras verificações:
+
+- `npm run check:api-drift`: falha se `src/api/schema.d.ts` divergir do OpenAPI do backend.
+- `npm run test:prod-bundle`: prova que o build de produção não leva o token de cartão falso.
+- `npm run test:e2e`: ponta a ponta contra um backend de dev com seed (ver [e2e/README.md](e2e/README.md)).
