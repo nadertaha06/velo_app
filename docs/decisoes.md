@@ -105,3 +105,35 @@ nunca é mostrado.
   outro convite e sair. As abas entram nas etapas 2 a 4.
 - A confirmação de troca de e-mail (`/confirmar-email`) fica para a etapa 4,
   junto com o Perfil.
+
+## 2026-11-25 — marca
+
+### D8. Marca (kit em `../velo-brand-kit/`)
+- **O que veio do kit:** só três arquivos, em `assets/brand/`.
+  - `icon-1024.png`: ícone do app (`app/icon-1024.png` do kit, igual ao
+    `png/icon-lime/1024.png`). Conferido: PNG RGB (tipo de cor 2), sem canal
+    alfa e sem `tRNS`, como a Apple exige.
+  - `splash-symbol-black.png`: splash, a partir de `png/symbol-black/1024.png`.
+    O plugin `expo-splash-screen` só aceita PNG, não SVG. Fica centralizado, com
+    160 pt de largura, sobre fundo `#ffffff`. O Expo Go mostra o ícone no lugar
+    do splash (doc do SDK 58), então ele só aparece de verdade num build.
+  - `symbol-black.svg`: fonte do vetor. O `d` e o `viewBox` desse arquivo estão
+    em `src/components/brand/symbolPath.ts` e são desenhados com
+    `react-native-svg` (`VeloSymbol`). Assim não entra transformador de SVG no
+    Metro.
+- **Removidos:** os placeholders do template do Expo (ícone, splash, ícones
+  adaptativos do Android e favicon). O app é iOS no MVP, e o Android usa o
+  `icon` comum até termos as camadas do ícone adaptativo.
+- **Wordmark:** o kit não traz o wordmark em arquivo (a prancha mostra, mas não
+  há SVG nem PNG). O `VeloLogo` monta símbolo + "Velo" em Archivo 800. Para leitor
+  de tela, ele é uma imagem com o rótulo "Velo". O símbolo acompanha a fonte do
+  sistema até 2×. Aparece no topo do login e do cadastro.
+- **Cores:** estes valores substituem a tabela da seção 2 da spec.
+  - `lime` passa de `#D6F33A` para `#A3FF00`, a cor oficial. Texto sobre lime
+    continua `ink` (15,5:1).
+  - `danger` = `#FF1A1A`, o vermelho da marca, só para fundo, borda ou ícone de
+    erro: tem 3,88:1 com branco, acima do 3:1 de elemento gráfico. Texto branco
+    pequeno sobre ele é proibido (3,88:1 < 4,5:1).
+  - `dangerText` = `#D10000` para texto de erro: 5,66:1 com `bg` e 5,23:1 com
+    `surface`. O `AppText` com `tone="danger"` usa esse.
+  - Os contrastes são verificados em `src/theme/__tests__/tokens.test.ts`.
