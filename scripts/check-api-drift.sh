@@ -3,30 +3,35 @@
 #
 # Fonte do OpenAPI, nesta ordem:
 #   1. OPENAPI_URL (URL ou arquivo), se definida;
-#   2. senão, gerado direto do código do backend em BACKEND_DIR
-#      (padrão ../velo_backend), sem servidor nem banco. Mostra o commit usado.
+#   2. senão, gerado do código COMMITADO do backend em BACKEND_DIR (padrão
+#      ../velo_backend), no ref BACKEND_REF (padrão HEAD; ex.: origin/feat/etapa-6),
+#      numa worktree temporária, sem servidor nem banco. Mudanças não commitadas
+#      do backend ficam de fora. Mostra o commit usado.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+WT=""
+cleanup() {
+  if [ -n "$WT" ]; then git -C "$BACKEND_DIR" worktree remove --force "$WT" >/dev/null 2>&1 || true; fi
+  rm -rf "$TMP"
+}
+trap cleanup EXIT
 
 if [ -n "${OPENAPI_URL:-}" ]; then
   SRC="$OPENAPI_URL"
   echo "check-api-drift: OpenAPI de $SRC"
 else
-  BACKEND_DIR="${BACKEND_DIR:-../velo_backend}"
-  if [ ! -d "$BACKEND_DIR" ]; then
-    echo "check-api-drift: backend não encontrado em $BACKEND_DIR (defina BACKEND_DIR ou OPENAPI_URL)" >&2
-    exit 2
-  fi
-  commit="$(git -C "$BACKEND_DIR" rev-parse --short HEAD)"
-  branch="$(git -C "$BACKEND_DIR" rev-parse --abbrev-ref HEAD)"
-  dirty=""
-  [ -n "$(git -C "$BACKEND_DIR" status --porcelain)" ] && dirty=" (com mudanças locais)"
-  echo "check-api-drift: OpenAPI gerado do backend $branch@$commit$dirty"
+  BACKEND_DIR="$(cd "${BACKEND_DIR:-../velo_backend}" && pwd)"
+  REF="${BACKEND_REF:-HEAD}"
+  commit="$(git -C "$BACKEND_DIR" rev-parse --short "$REF")"
+  echo "check-api-drift: OpenAPI gerado do backend $REF ($commit), só o que está commitado"
+  WT="$TMP/backend"
+  git -C "$BACKEND_DIR" worktree add --detach --quiet "$WT" "$commit"
+  # O create_app lê a configuração do .env do backend (não é versionado).
+  [ -f "$BACKEND_DIR/.env" ] && cp "$BACKEND_DIR/.env" "$WT/.env"
   SRC="$TMP/openapi.json"
-  (cd "$BACKEND_DIR" && uv run --quiet python -c \
+  (cd "$WT" && uv run --quiet python -c \
     'import json; from app.main import create_app; print(json.dumps(create_app().openapi()))') >"$SRC"
 fi
 
