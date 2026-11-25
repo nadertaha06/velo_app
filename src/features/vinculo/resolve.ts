@@ -2,14 +2,9 @@ import type { components } from '@/api/schema';
 
 export type Vinculo = components['schemas']['MeuVinculoOut'];
 
-/**
- * Chave do vínculo escolhido. PROVISÓRIO: `GET /me` ainda não devolve o id do
- * vínculo, então a chave combina condomínio, unidade e papel, que o backend já
- * garante únicos para vínculos vivos (índice `uq_vinculos_vivo`). Quando o
- * backend expuser `vinculo_id`, só esta função muda. Ver docs/decisoes.md, D2.
- */
+/** Chave do vínculo escolhido: o id que o backend devolve em `GET /me` (D2). */
 export function vinculoKey(v: Vinculo): string {
-  return [v.condominio_id, v.unidade_id ?? '-', v.papel].join(':');
+  return v.vinculo_id;
 }
 
 export type Resolution =

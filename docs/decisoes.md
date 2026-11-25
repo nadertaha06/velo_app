@@ -31,11 +31,12 @@ seção 10). A mais recente fica no fim.
   conferida contra a lista do `GET /me` a cada abertura: escolha que não existe
   mais faz perguntar de novo. O seletor do Perfil entra na etapa 4 (hoje há o
   botão "Trocar condomínio ou unidade" no início provisório).
-- **Provisório:** `GET /me` não devolve o id do vínculo (`MeuVinculoOut` não tem
-  `vinculo_id`). A chave guardada combina `condominio_id`, `unidade_id` e
-  `papel`, que o backend já garante únicos para vínculos vivos (índice
-  `uq_vinculos_vivo`). A troca para o id fica isolada em `vinculoKey()`.
-  **Pedido para o backend:** incluir `vinculo_id` em `MeuVinculoOut`.
+- **Chave:** o `vinculo_id` que o `GET /me` devolve em cada vínculo (backend,
+  D69), em `vinculoKey()`.
+- **Histórico:** até a D69 do backend, o `GET /me` não trazia o id. A chave
+  provisória combinava `condominio_id`, `unidade_id` e `papel`. Uma escolha
+  guardada nesse formato antigo não bate com nenhum id e faz o app perguntar de
+  novo, uma vez, sem migração.
 
 ### D3. Dependências além da seção 1 da spec
 Aprovadas na conversa da etapa 1:

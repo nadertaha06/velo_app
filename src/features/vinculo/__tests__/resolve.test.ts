@@ -1,6 +1,7 @@
 import { resolveVinculo, vinculoKey, type Vinculo } from '../resolve';
 
-const v = (condominio_id: string, unidade_id: string | null, papel: string): Vinculo => ({
+const v = (vinculo_id: string, condominio_id: string, unidade_id: string | null, papel: string): Vinculo => ({
+  vinculo_id,
   condominio_id,
   condominio_nome: `Condomínio ${condominio_id}`,
   papel,
@@ -9,8 +10,8 @@ const v = (condominio_id: string, unidade_id: string | null, papel: string): Vin
   numero: unidade_id ? '101' : null,
 });
 
-const a = v('c1', 'u1', 'responsavel');
-const b = v('c2', 'u2', 'membro');
+const a = v('v1', 'c1', 'u1', 'responsavel');
+const b = v('v2', 'c2', 'u2', 'membro');
 
 describe('resolveVinculo', () => {
   it('sem vínculo', () => {
@@ -30,11 +31,14 @@ describe('resolveVinculo', () => {
   });
 
   it('guardado que não existe mais faz perguntar de novo', () => {
-    expect(resolveVinculo([a, b], vinculoKey(v('c9', 'u9', 'membro')))).toMatchObject({ kind: 'choose' });
+    expect(resolveVinculo([a, b], vinculoKey(v('v9', 'c9', 'u9', 'membro')))).toMatchObject({ kind: 'choose' });
   });
 
-  it('a chave distingue papel e unidade no mesmo condomínio', () => {
-    expect(vinculoKey(v('c1', 'u1', 'membro'))).not.toBe(vinculoKey(v('c1', 'u1', 'responsavel')));
-    expect(vinculoKey(v('c1', null, 'portaria'))).not.toBe(vinculoKey(v('c1', 'u1', 'portaria')));
+  it('a chave é o vinculo_id do backend', () => {
+    expect(vinculoKey(a)).toBe('v1');
+  });
+
+  it('chave no formato antigo (condomínio:unidade:papel) faz perguntar de novo', () => {
+    expect(resolveVinculo([a, b], 'c2:u2:membro')).toMatchObject({ kind: 'choose' });
   });
 });
