@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { userMessage } from '@/api/errors';
+import { isApiError, userMessage } from '@/api/errors';
 import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
@@ -13,12 +13,13 @@ import { FormMessage } from '@/components/FormMessage';
 import { InfoRow } from '@/components/InfoRow';
 import { Screen } from '@/components/Screen';
 import { formatCents, formatDateTime, formatPeriod } from '@/lib/format';
+import { serverNow } from '@/lib/serverClock';
 import { vagaTitulo } from '@/features/explorar/VagaCard';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import type { PedidoFeito } from './api';
-import { useCancelarPedido, usePedido } from './hooks';
-import { formaPagamentoLabel, isPendente, statusLabel, statusTone } from './labels';
+import { podeCancelar, useCancelarPedido, usePedido } from './hooks';
+import { formaPagamentoLabel, statusLabel, statusTone } from './labels';
 
 export function PedidoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -54,10 +55,16 @@ function cabecalho(p: PedidoFeito): { titulo: string; texto: string } {
           : 'Nada foi cobrado. Se o pedido for aprovado, você recebe o código Pix para pagar.',
       };
     case 'aguardando_pix':
-      return {
-        titulo: 'Pague com Pix',
-        texto: 'Copie o código abaixo no app do seu banco. Se o pagamento não chegar no prazo, o pedido expira.',
-      };
+      // O copia e cola só vem para quem fez o pedido (backend D65).
+      return p.pix_copia_cola
+        ? {
+            titulo: 'Pague com Pix',
+            texto: 'Copie o código abaixo no app do seu banco. Se o pagamento não chegar no prazo, o pedido expira.',
+          }
+        : {
+            titulo: 'Aguardando o Pix',
+            texto: 'O pagamento é feito por quem fez o pedido. Se não chegar no prazo, o pedido expira.',
+          };
     case 'confirmado':
       return { titulo: 'Reserva confirmada', texto: 'Tudo certo. A vaga é sua no período abaixo.' };
     case 'em_uso':
@@ -69,15 +76,33 @@ function cabecalho(p: PedidoFeito): { titulo: string; texto: string } {
     case 'expirado':
       return { titulo: 'Pedido expirado', texto: 'O prazo acabou sem resposta ou sem pagamento. Nada foi cobrado.' };
     case 'cancelado':
-      return { titulo: 'Pedido cancelado', texto: 'Este pedido foi cancelado.' };
+      return { titulo: 'Pedido cancelado', texto: textoCancelado(p) };
     default:
       return { titulo: statusLabel(p.status), texto: '' };
   }
 }
 
+const CANCELADO_POR: Record<string, string> = {
+  locatario: 'por quem fez o pedido',
+  dono: 'pelo dono da vaga',
+  admin: 'pela administração do Velo',
+  sistema: 'automaticamente, porque o vínculo com a unidade foi encerrado',
+};
+
+/** Reembolso: o valor vem do backend (`reembolso_centavos`); o app só mostra. */
+function textoCancelado(p: PedidoFeito): string {
+  const quem = p.cancelado_por ? CANCELADO_POR[p.cancelado_por] : null;
+  const base = quem ? `Cancelado ${quem}.` : 'Este pedido foi cancelado.';
+  if (p.reembolso_centavos == null) return base;
+  return p.reembolso_centavos > 0
+    ? `${base} Você recebe ${formatCents(p.reembolso_centavos)} de volta na forma de pagamento usada.`
+    : `${base} Não há valor a devolver.`;
+}
+
 function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
   const qc = useQueryClient();
-  const cancelar = useCancelarPedido();
+  const cancelar = useCancelarPedido(p.id);
+  const [confirmando, setConfirmando] = useState(false);
   // Ao zerar o contador, consulta de novo: quem decide se expirou é o backend.
   const onFim = useCallback(() => void qc.invalidateQueries({ queryKey: ['pedidos'] }), [qc]);
   const { titulo, texto } = cabecalho(p);
@@ -88,13 +113,25 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
     <Screen
       edges={['bottom']}
       footer={
-        isPendente(p.status) || p.status === 'confirmado' ? (
-          <>
-            <Button variant="secondary" label="Cancelar pedido (em breve)" disabled={!cancelar.disponivel} />
-            <AppText variant="small" tone="subtle" style={styles.centerText}>
-              O cancelamento pelo app chega em breve.
-            </AppText>
-          </>
+        podeCancelar(p.status) ? (
+          confirmando ? (
+            <>
+              <AppText variant="small" tone="muted">
+                Antes do início, você recebe de volta o que foi pago, menos a taxa de serviço. Depois do
+                início, não há reembolso. Se ainda não houve cobrança, nada é cobrado. O valor exato
+                aparece depois do cancelamento.
+              </AppText>
+              <FormMessage message={cancelar.error ? erroCancelar(cancelar.error) : null} />
+              <Button
+                label="Confirmar cancelamento"
+                loading={cancelar.isPending}
+                onPress={() => cancelar.mutate(undefined, { onSuccess: () => setConfirmando(false) })}
+              />
+              <Button variant="ghost" label="Voltar" onPress={() => setConfirmando(false)} />
+            </>
+          ) : (
+            <Button variant="secondary" label="Cancelar pedido" onPress={() => setConfirmando(true)} />
+          )
         ) : null
       }
     >
@@ -106,7 +143,7 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
           <AppText variant="small" tone="muted">
             Prazo até {formatDateTime(prazo)}
           </AppText>
-          <Countdown ate={prazo} onFim={onFim} />
+          <Countdown ate={prazo} onFim={onFim} now={serverNow} />
         </Card>
       ) : null}
 
@@ -134,9 +171,14 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
   );
 }
 
+/** 404 aqui: o pedido é de outro morador da unidade (só quem fez cancela, backend D72). */
+function erroCancelar(err: unknown): string {
+  if (isApiError(err, 'not_found')) return 'Só quem fez o pedido pode cancelar.';
+  return userMessage(err);
+}
+
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
-  centerText: { textAlign: 'center' },
   pix: {
     gap: spacing.sm,
     padding: spacing.lg,

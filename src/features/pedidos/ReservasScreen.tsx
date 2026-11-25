@@ -35,6 +35,7 @@ function Reservas() {
   return (
     <Screen
       title="Minhas reservas"
+      subtitle="Pedidos feitos pela sua unidade"
       edges={['top']}
       onRefresh={() => void pedidos.refetch()}
       refreshing={pedidos.isRefetching}

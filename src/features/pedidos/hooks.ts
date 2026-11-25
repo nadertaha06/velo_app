@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useActiveVinculo } from '@/features/vinculo/useActiveVinculo';
 
-import { pedidosApi, type PedidoIn } from './api';
+import { pedidosApi, type PedidoFeito, type PedidoIn } from './api';
 import { isPendente } from './labels';
 
 function usePath() {
@@ -21,13 +21,25 @@ export function usePedidos() {
   });
 }
 
-/** Enquanto o pedido espera o dono ou o Pix, consulta de novo a cada 15 s. */
+export const POLL_MS = 15_000;
+
+/** Intervalo de consulta: só enquanto o pedido espera o dono ou o Pix; em status final, para. */
+export function pollInterval(pedido: Pick<PedidoFeito, 'status'> | undefined): number | false {
+  return pedido && isPendente(pedido.status) ? POLL_MS : false;
+}
+
+/**
+ * Pedido em acompanhamento. Consulta de novo a cada 15 s enquanto pendente.
+ * Em segundo plano o intervalo para (`setupAppFocus`), e ao voltar busca na hora.
+ */
 export function usePedido(pedidoId: string) {
   const path = usePath();
   return useQuery({
     queryKey: [...pedidosKey(path.condominio_id, path.unidade_id), pedidoId],
     queryFn: () => pedidosApi.get(path, pedidoId),
-    refetchInterval: (q) => (q.state.data && isPendente(q.state.data.status) ? 15_000 : false),
+    refetchInterval: (q) => pollInterval(q.state.data),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: 'always',
   });
 }
 
@@ -40,11 +52,24 @@ export function useCriarPedido() {
   });
 }
 
+/** Estados em que quem alugou pode cancelar (backend D72). */
+export function podeCancelar(status: string): boolean {
+  return ['aguardando_dono', 'aguardando_pix', 'confirmado', 'em_uso'].includes(status);
+}
+
 /**
- * Cancelar pedido. A rota ainda não existe no backend (etapa 6 dele): enquanto
- * não estiver no OpenAPI, `disponivel` é falso e o botão aparece desabilitado.
- * Quando a rota entrar, `gen:api` + implementar `cancelar` aqui (só aqui).
+ * Quem fez o pedido cancela. O reembolso é decidido e devolvido pelo backend
+ * (`reembolso_centavos`); o app não calcula (D72 do backend, D11 do app).
  */
-export function useCancelarPedido(): { disponivel: false } {
-  return { disponivel: false };
+export function useCancelarPedido(pedidoId: string) {
+  const path = usePath();
+  const qc = useQueryClient();
+  const key = pedidosKey(path.condominio_id, path.unidade_id);
+  return useMutation({
+    mutationFn: () => pedidosApi.cancelar(path, pedidoId),
+    onSuccess: (pedido) => {
+      qc.setQueryData([...key, pedidoId], pedido);
+      void qc.invalidateQueries({ queryKey: key });
+    },
+  });
 }
