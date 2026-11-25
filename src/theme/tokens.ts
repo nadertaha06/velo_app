@@ -2,7 +2,8 @@
 export const colors = {
   ink: '#0e0e0e',
   bg: '#ffffff',
-  lime: '#D6F33A',
+  /** Cor oficial da marca. Texto sobre lime é sempre `ink`. */
+  lime: '#A3FF00',
   surface: '#f6f6f3',
   chip: '#f1f1ef',
   border: '#e6e6e3',
@@ -10,8 +11,13 @@ export const colors = {
   textSubtle: '#5f5f5c',
   /** Texto sobre `ink` (botão secundário, cartão escuro). */
   onInk: '#ffffff',
-  /** Erro de formulário: contraste ≥ 4,5:1 com `bg`. */
-  danger: '#b3261e',
+  /**
+   * Vermelho da marca, para erro. Só como fundo, borda ou ícone (3,88:1 com `bg`,
+   * acima do 3:1 de elemento gráfico). Nunca com texto branco pequeno.
+   */
+  danger: '#FF1A1A',
+  /** Texto de erro: 5,66:1 com `bg` e 5,23:1 com `surface`. */
+  dangerText: '#D10000',
 } as const;
 
 export const radius = {
