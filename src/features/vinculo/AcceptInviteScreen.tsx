@@ -12,7 +12,7 @@ import { authApi } from '@/features/auth/api';
 import { meQueryKey } from './VinculoProvider';
 
 /** Quem já tem conta aceita um convite novo por aqui (POST /convites/aceitar). */
-export function AcceptInviteScreen() {
+export function AcceptInviteForm() {
   const queryClient = useQueryClient();
   const [token, setToken] = useState<string | null>(null);
   const accept = useMutation({
@@ -24,7 +24,7 @@ export function AcceptInviteScreen() {
   });
 
   return (
-    <Screen title="Aceitar convite">
+    <>
       <AppText tone="muted">Abra neste celular o link do convite que você recebeu.</AppText>
       <FormMessage
         tone={accept.isSuccess ? 'info' : 'error'}
@@ -39,6 +39,14 @@ export function AcceptInviteScreen() {
           onPress={() => token && accept.mutate(token)}
         />
       ) : null}
+    </>
+  );
+}
+
+export function AcceptInviteScreen() {
+  return (
+    <Screen title="Aceitar convite" edges={['bottom']}>
+      <AcceptInviteForm />
     </Screen>
   );
 }
