@@ -31,12 +31,15 @@ Tokens em `src/theme/tokens.ts`. Use só eles, nunca cor ou tamanho solto em tel
 |---|---|---|
 | `ink` | `#0e0e0e` | texto principal, botão secundário, cartão escuro |
 | `bg` | `#ffffff` | fundo |
-| `lime` | `#D6F33A` | ação principal, destaques. **Texto sobre limão é sempre `ink`.** |
+| `lime` | `#A3FF00` | ação principal, destaques (cor oficial da marca). **Texto sobre limão é sempre `ink`.** |
 | `surface` | `#f6f6f3` | cartões |
 | `chip` | `#f1f1ef` | chips não selecionados |
 | `border` | `#e6e6e3` | bordas |
 | `textMuted` | `#4a4a47` | texto secundário (contraste ≥ 4,5:1 com `bg` e `surface`) |
 | `textSubtle` | `#5f5f5c` | rótulos pequenos |
+| `onInk` | `#ffffff` | texto sobre `ink` |
+| `danger` | `#FF1A1A` | vermelho da marca para erro: só fundo, borda ou ícone (3:1 com `bg`). **Nunca com texto branco pequeno.** |
+| `dangerText` | `#D10000` | texto de erro (contraste ≥ 4,5:1 com `bg` e `surface`) |
 
 - Fonte: Archivo (400 a 900). Títulos 24–28 px peso 800, letter-spacing −0,02 em. Placa e códigos em JetBrains Mono.
 - Raios: 12 (inputs, chips de modalidade), 14–16 (cartões, botões), 18–20 (cartões grandes).

@@ -128,12 +128,12 @@ nunca é mostrado.
   há SVG nem PNG). O `VeloLogo` monta símbolo + "Velo" em Archivo 800. Para leitor
   de tela, ele é uma imagem com o rótulo "Velo". O símbolo acompanha a fonte do
   sistema até 2×. Aparece no topo do login e do cadastro.
-- **Cores:** estes valores substituem a tabela da seção 2 da spec.
-  - `lime` passa de `#D6F33A` para `#A3FF00`, a cor oficial. Texto sobre lime
-    continua `ink` (15,5:1).
-  - `danger` = `#FF1A1A`, o vermelho da marca, só para fundo, borda ou ícone de
-    erro: tem 3,88:1 com branco, acima do 3:1 de elemento gráfico. Texto branco
-    pequeno sobre ele é proibido (3,88:1 < 4,5:1).
-  - `dangerText` = `#D10000` para texto de erro: 5,66:1 com `bg` e 5,23:1 com
-    `surface`. O `AppText` com `tone="danger"` usa esse.
+- **Cores (motivo da troca):** os valores estão na seção 2 da spec.
+  - `lime` foi de `#D6F33A` para `#A3FF00` porque `#A3FF00` é a cor oficial do
+    kit. Texto `ink` sobre ele dá 15,5:1.
+  - O `#FF1A1A` da marca dá só 3,88:1 com branco. Serve para elemento gráfico
+    (mínimo de 3:1), mas não para texto (mínimo de 4,5:1). Por isso o erro tem
+    dois tokens: `danger`, para fundo, borda e ícone, e `dangerText` (`#D10000`,
+    5,66:1 com `bg`) para texto. Texto branco pequeno sobre `danger` daria
+    3,88:1 e fica proibido.
   - Os contrastes são verificados em `src/theme/__tests__/tokens.test.ts`.
