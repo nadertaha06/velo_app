@@ -289,3 +289,29 @@ nunca é mostrado.
   com o preset do Expo, o `Request` era o do Node, e por isso só lá dava
   "Unsupported BodyInit type". **Ainda vale conferir no iPhone um POST com corpo
   (login).**
+
+### D18. Sincronização com o backend `origin/feat/etapa-6@36070ff`
+- **`gen:api`** a partir do OpenAPI desse commit, numa worktree temporária só com o
+  código commitado. `check:api-drift` com `BACKEND_REF=origin/feat/etapa-6` dá ok.
+- **`PedidoFeitoOut` não mudou** (ainda sem `feito_por_mim`, D16).
+- **Status de pedido que o app passou a descrever:**
+  - `processando_pagamento` (D71 do backend; já existia e faltava no app): o
+    gateway ainda não respondeu. Conta como pendente, então o polling continua;
+  - `nao_entregue` (D78 do backend): a reserva foi encerrada por vaga não
+    entregue. Mostra o reembolso quando a API o devolve no pedido.
+- **Fora do app por enquanto:**
+  - cancelamento pelo admin com `solicitado_por` (D75): o app não tem papel de
+    admin;
+  - a **tela de aviso de vaga não entregue** (D78): não está na spec do app. A
+    rota já está no cliente gerado e foi exercitada no e2e. Falta decidir em que
+    etapa entra.
+- **Resultados esperados no e2e, revistos:**
+  - o 3º cancelamento do dono da vaga 47 suspende a vaga (contagem por vaga, D76).
+    O dono só seria suspenso com 5 pontos;
+  - a perda de vínculo encerra a reserva já iniciada como `cancelado` por
+    `sistema`, com reembolso das diárias restantes (D77);
+  - vaga não entregue: aviso durante a reserva, o cancelamento fica bloqueado
+    (`report_in_progress`), e com a confirmação do dono o pedido vai a
+    `nao_entregue` com 100% de reembolso para diária;
+  - estorno de uma cobrança criada pelo `seed-dev`: aceito pelo servidor, graças ao
+    fake em arquivo do backend (D82 dele).
