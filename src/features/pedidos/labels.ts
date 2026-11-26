@@ -42,6 +42,7 @@ export type Porte = (typeof PORTES)[number];
 export const porteLabel: Record<Porte, string> = { P: 'Pequeno', M: 'Médio', G: 'Grande' };
 
 const STATUS: Record<string, string> = {
+  processando_pagamento: 'Processando pagamento',
   aguardando_dono: 'Aguardando resposta',
   aguardando_pix: 'Aguardando Pix',
   confirmado: 'Confirmada',
@@ -50,6 +51,7 @@ const STATUS: Record<string, string> = {
   recusado: 'Recusado',
   expirado: 'Expirado',
   cancelado: 'Cancelado',
+  nao_entregue: 'Vaga não entregue',
 };
 
 export function statusLabel(status: string): string {
@@ -59,15 +61,18 @@ export function statusLabel(status: string): string {
 export type StatusTone = 'lime' | 'ink' | 'neutral' | 'danger';
 
 export function statusTone(status: string): StatusTone {
-  if (status === 'aguardando_dono' || status === 'aguardando_pix') return 'lime';
+  if (isPendente(status)) return 'lime';
   if (status === 'confirmado' || status === 'em_uso') return 'ink';
-  if (status === 'recusado' || status === 'expirado') return 'danger';
+  if (status === 'recusado' || status === 'expirado' || status === 'nao_entregue') return 'danger';
   return 'neutral';
 }
 
-/** Estados em que o pedido ainda pode mudar sozinho (o app consulta de novo). */
+/**
+ * Estados em que o pedido ainda pode mudar sozinho (o app consulta de novo).
+ * `processando_pagamento`: o gateway ainda não respondeu (backend D71).
+ */
 export function isPendente(status: string): boolean {
-  return status === 'aguardando_dono' || status === 'aguardando_pix';
+  return status === 'processando_pagamento' || status === 'aguardando_dono' || status === 'aguardando_pix';
 }
 
 export function formaPagamentoLabel(forma: string): string {

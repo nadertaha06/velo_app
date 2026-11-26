@@ -36,7 +36,8 @@ afterEach(() => {
 it('pollInterval: só em status pendente', () => {
   expect(pollInterval({ status: 'aguardando_dono' })).toBe(POLL_MS);
   expect(pollInterval({ status: 'aguardando_pix' })).toBe(POLL_MS);
-  for (const s of ['confirmado', 'em_uso', 'concluido', 'recusado', 'expirado', 'cancelado']) {
+  expect(pollInterval({ status: 'processando_pagamento' })).toBe(POLL_MS);
+  for (const s of ['confirmado', 'em_uso', 'concluido', 'recusado', 'expirado', 'cancelado', 'nao_entregue']) {
     expect(pollInterval({ status: s })).toBe(false);
   }
   expect(pollInterval(undefined)).toBe(false);

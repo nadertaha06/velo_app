@@ -14,3 +14,12 @@ it('status', () => {
   expect(isPendente('aguardando_pix')).toBe(true);
   expect(isPendente('confirmado')).toBe(false);
 });
+
+it('status novos do backend (D71, D78)', () => {
+  expect(statusLabel('processando_pagamento')).toBe('Processando pagamento');
+  expect(isPendente('processando_pagamento')).toBe(true);
+  expect(statusTone('processando_pagamento')).toBe('lime');
+  expect(statusLabel('nao_entregue')).toBe('Vaga não entregue');
+  expect(statusTone('nao_entregue')).toBe('danger');
+  expect(isPendente('nao_entregue')).toBe(false);
+});

@@ -47,6 +47,11 @@ function cabecalho(p: PedidoFeito): { titulo: string; texto: string } {
   const dono = p.dono.primeiro_nome ?? 'o responsável';
   const cartao = p.forma_pagamento === 'cartao';
   switch (p.status) {
+    case 'processando_pagamento':
+      return {
+        titulo: 'Processando o pagamento',
+        texto: 'Estamos confirmando o pagamento com a operadora. Isso costuma levar poucos segundos.',
+      };
     case 'aguardando_dono':
       return {
         titulo: `Aguardando ${dono} responder`,
@@ -77,6 +82,14 @@ function cabecalho(p: PedidoFeito): { titulo: string; texto: string } {
       return { titulo: 'Pedido expirado', texto: 'O prazo acabou sem resposta ou sem pagamento. Nada foi cobrado.' };
     case 'cancelado':
       return { titulo: 'Pedido cancelado', texto: textoCancelado(p) };
+    case 'nao_entregue':
+      return {
+        titulo: 'Vaga não entregue',
+        texto:
+          p.reembolso_centavos != null && p.reembolso_centavos > 0
+            ? `A reserva foi encerrada. Você recebe ${formatCents(p.reembolso_centavos)} de volta na forma de pagamento usada.`
+            : 'A reserva foi encerrada. O reembolso segue a análise do aviso.',
+      };
     default:
       return { titulo: statusLabel(p.status), texto: '' };
   }
