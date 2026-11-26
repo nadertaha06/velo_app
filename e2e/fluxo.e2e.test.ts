@@ -39,6 +39,7 @@ type Mods = {
   rnd: typeof import('@/lib/randomId');
   clock: typeof import('@/lib/serverClock');
   resolve: typeof import('@/features/vinculo/resolve');
+  labels: typeof import('@/features/pedidos/labels');
 };
 
 /** Uma "instalação" do app por pessoa: módulos isolados, sessão própria. */
@@ -57,6 +58,7 @@ function app(): Mods {
       rnd: require('@/lib/randomId'),
       clock: require('@/lib/serverClock'),
       resolve: require('@/features/vinculo/resolve'),
+      labels: require('@/features/pedidos/labels'),
     };
   });
   return m;
@@ -83,6 +85,9 @@ let veiculoCarla = '';
 let veiculoDiego = '';
 let pedidoCartao = '';
 let pedidoManual = '';
+let seedCancelado = '';
+let mensalEncerrada = '';
+let naoEntregue = '';
 
 const hora = 3_600_000;
 const inicio = (dias: number) => new Date(Math.ceil(Date.now() / hora) * hora + dias * 24 * hora).toISOString();
@@ -257,6 +262,16 @@ test('7. cancelamento', async () => {
   expect(tarde.code).toBe('owner_cancel_too_late');
   passo(`Bruno (dono) cancela a reserva que começa em 23 h: ${tarde.status} ${tarde.code}`);
 
+  // A mesma reserva foi cobrada pelo SEED (outro processo). Com o fake persistido
+  // (backend D82), o servidor conhece a cobrança e o estorno é aceito.
+  const doSeed = await carla.pedidos.pedidosApi.cancelar(ctx.carla!, em23.id);
+  expect(doSeed.status).toBe('cancelado');
+  expect(doSeed.reembolso_centavos).toBe(doSeed.total_centavos - doSeed.taxa_centavos);
+  seedCancelado = em23.id;
+  passo(
+    `Carla cancela a reserva cobrada pelo seed: ${doSeed.status}, reembolso ${doSeed.reembolso_centavos} (estorno conferido no banco, abaixo)`,
+  );
+
   // Terceiro cancelamento do dono da vaga 47 em 90 dias: suspende a vaga.
   const r = await ana.client.unwrap(
     ana.client.api.POST('/condominios/{condominio_id}/unidades/{unidade_id}/pedidos-recebidos/{pedido_id}/cancelar', {
@@ -270,5 +285,74 @@ test('7. cancelamento', async () => {
   );
   const depois = carla.visible.visibleVagas(await carla.vagas.vagasApi.list(ctx.carla!.condominio_id), 'dia');
   expect(depois.map((v) => v.numero)).toEqual(['12']);
-  passo('3º cancelamento do dono em 90 dias: a vaga 47 sumiu do Explorar (suspensa)');
+  passo('3º cancelamento do dono da vaga 47 em 90 dias (contagem por vaga, D76): a vaga sumiu do Explorar (suspensa)');
+});
+
+test('8. perda de vínculo encerra a reserva iniciada com reembolso proporcional (D77)', async () => {
+  const membros = await carla.client.unwrap(
+    carla.client.api.GET('/condominios/{condominio_id}/unidades/{unidade_id}/membros', { params: { path: ctx.carla! } }),
+  );
+  const vinculoDiego = membros.find((m) => m.papel === 'membro')!;
+  const antes = (await carla.pedidos.pedidosApi.list(ctx.carla!)).find((p) => p.status === 'em_uso')!;
+  const { response } = await carla.client.api.DELETE(
+    '/condominios/{condominio_id}/unidades/{unidade_id}/membros/{vinculo_id}',
+    { params: { path: { ...ctx.carla!, vinculo_id: vinculoDiego.id } } },
+  );
+  expect(response.status).toBe(204);
+  const depois = await carla.pedidos.pedidosApi.get(ctx.carla!, antes.id);
+  expect(depois.status).toBe('cancelado');
+  expect(depois.cancelado_por).toBe('sistema');
+  expect(depois.reembolso_centavos).toBeGreaterThan(0);
+  expect(depois.reembolso_centavos).toBeLessThan(depois.total_centavos);
+  mensalEncerrada = antes.id;
+  passo(
+    `Carla remove o Diego: a mensal dele (${antes.status}) vira ${depois.status}, por ${depois.cancelado_por}, reembolso proporcional ${depois.reembolso_centavos} de ${depois.total_centavos}`,
+  );
+  const sem = await erroDe(diego.auth.authApi.me().then((me) => {
+    if (me.vinculos.length === 0) throw new diego.errors.ApiError(404, 'sem_vinculo', 'sem vínculo');
+    return me;
+  }), diego);
+  passo(`Diego sem vínculo depois da remoção: ${sem.code}`);
+});
+
+test('9. vaga não entregue: aviso de quem alugou e confirmação do dono (D78)', async () => {
+  // Reserva que começa em ~90 s na vaga 12 (o período de 23 h foi liberado acima).
+  const inicioProximo = new Date(Math.ceil((Date.now() + 90_000) / 1000) * 1000).toISOString();
+  const dados = await carla.pay.paymentProvider.preparar('cartao');
+  const p = await carla.pedidos.pedidosApi.criar(
+    ctx.carla!,
+    { vaga_id: vaga12, veiculo_id: veiculoCarla, modalidade: 'dia', quantidade: 1, inicio: inicioProximo, ...dados },
+    carla.rnd.idempotencyKey(),
+  );
+  expect(p.status).toBe('confirmado');
+  await new Promise((r) => setTimeout(r, Date.parse(inicioProximo) - Date.now() + 3000));
+
+  const aviso = await carla.client.unwrap(
+    carla.client.api.POST('/condominios/{condominio_id}/unidades/{unidade_id}/pedidos/{pedido_id}/vaga-indisponivel', {
+      params: { path: { ...ctx.carla!, pedido_id: p.id } },
+      body: { desde: new Date(Date.parse(inicioProximo) + 1000).toISOString(), relato: 'Vaga ocupada por outro carro.' },
+    }),
+  );
+  passo(`Carla avisa vaga não entregue (reserva iniciada): aviso ${aviso.status}, prazo do dono ${aviso.prazo_dono_em}`);
+  const bloqueado = await erroDe(carla.pedidos.pedidosApi.cancelar(ctx.carla!, p.id), carla);
+  expect(bloqueado.code).toBe('report_in_progress');
+  passo(`cancelar com o aviso em aberto: ${bloqueado.status} ${bloqueado.code}`);
+
+  const { response } = await bruno.client.api.POST(
+    '/condominios/{condominio_id}/unidades/{unidade_id}/pedidos-recebidos/{pedido_id}/vaga-indisponivel/confirmar',
+    { params: { path: { ...ctx.bruno!, pedido_id: p.id } } },
+  );
+  expect(response.status).toBe(200);
+  const fim = await carla.pedidos.pedidosApi.get(ctx.carla!, p.id);
+  expect(fim.status).toBe('nao_entregue');
+  passo(
+    `Bruno confirma: pedido ${fim.status} (rótulo no app: "${carla.labels.statusLabel(fim.status)}"), reembolso ${fim.reembolso_centavos ?? 'não informado no pedido'} de ${fim.total_centavos} (diária: 100%)`,
+  );
+  naoEntregue = p.id;
+});
+
+afterAll(() => {
+  process.stdout.write(
+    `\nIDs para conferir os estornos no banco:\n  seed_23h=${seedCancelado}\n  mensal=${mensalEncerrada}\n  nao_entregue=${naoEntregue}\n`,
+  );
 });

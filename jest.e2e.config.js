@@ -18,5 +18,5 @@ module.exports = {
   roots: ['<rootDir>/e2e'],
   testMatch: ['**/*.e2e.test.ts'],
   testPathIgnorePatterns: ['/node_modules/'],
-  testTimeout: 30000,
+  testTimeout: 180000,
 };
