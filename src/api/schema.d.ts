@@ -989,6 +989,121 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos/{pedido_id}/vaga-indisponivel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver Aviso Feito */
+        get: operations["ver_aviso_feito_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__vaga_indisponivel_get"];
+        put?: never;
+        /**
+         * Avisar Vaga Nao Entregue
+         * @description Só quem fez o pedido, durante a reserva. O dono é avisado por e-mail.
+         */
+        post: operations["avisar_vaga_nao_entregue_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__vaga_indisponivel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos/{pedido_id}/vaga-indisponivel/foto/concluir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Concluir Foto Nao Entregue */
+        post: operations["concluir_foto_nao_entregue_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__vaga_indisponivel_foto_concluir_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos-recebidos/{pedido_id}/vaga-indisponivel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver Aviso Recebido */
+        get: operations["ver_aviso_recebido_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__vaga_indisponivel_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos-recebidos/{pedido_id}/vaga-indisponivel/confirmar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirmar Nao Entrega
+         * @description O dono confirma: reembolso pelo fluxo da D71 e peso 2 no contador (D78).
+         */
+        post: operations["confirmar_nao_entrega_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__vaga_indisponivel_confirmar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/condominios/{condominio_id}/unidades/{unidade_id}/pedidos-recebidos/{pedido_id}/vaga-indisponivel/contestar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Contestar Nao Entrega
+         * @description O dono contesta: vai para a fila do admin.
+         */
+        post: operations["contestar_nao_entrega_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__vaga_indisponivel_contestar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/condominios/{condominio_id}/reservas-encerradas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reservas Encerradas
+         * @description Só o síndico: reservas canceladas ou encerradas por perda de vínculo (D77).
+         */
+        get: operations["reservas_encerradas_condominios__condominio_id__reservas_encerradas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/condominios/{condominio_id}/portaria/placas": {
         parameters: {
             query?: never;
@@ -1017,9 +1132,122 @@ export interface paths {
         put?: never;
         /**
          * Cancelar Como Admin
-         * @description Só o admin da plataforma: o desbloqueio do cancelamento fora do prazo do dono.
+         * @description Só o admin da plataforma: o desbloqueio do cancelamento fora das regras.
+         *     `solicitado_por` (obrigatório) decide o reembolso e a contagem (D75).
          */
         post: operations["cancelar_como_admin_admin_pedidos__pedido_id__cancelar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/pendencias-vinculo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pendencias De Vinculo
+         * @description Fila do admin: reservas de quem perdeu o vínculo com cobrança em andamento
+         *     (D77). As abertas se resolvem sozinhas quando a cobrança termina.
+         */
+        get: operations["pendencias_de_vinculo_admin_pendencias_vinculo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/denuncias-nao-entrega": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fila Nao Entrega */
+        get: operations["fila_nao_entrega_admin_denuncias_nao_entrega_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/denuncias-nao-entrega/{denuncia_id}/decidir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decidir Nao Entrega
+         * @description Só o admin, e só o que está esperando decisão (contestado ou em revisão).
+         */
+        post: operations["decidir_nao_entrega_admin_denuncias_nao_entrega__denuncia_id__decidir_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/estornos-recusados": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Estornos Recusados
+         * @description Fila do admin: o que o gateway recusou e o job não tenta de novo sozinho.
+         */
+        get: operations["estornos_recusados_admin_estornos_recusados_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/estornos/{estorno_id}/retentar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retentar Estorno */
+        post: operations["retentar_estorno_admin_estornos__estorno_id__retentar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/estornos/{estorno_id}/resolver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolver Estorno */
+        post: operations["resolver_estorno_admin_estornos__estorno_id__resolver_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1052,6 +1280,19 @@ export interface components {
         AcceptInviteIn: {
             /** Token */
             token: string;
+        };
+        /**
+         * CancelamentoAdminIn
+         * @description Quem pediu o cancelamento ao admin decide a regra (D75): `dono` conta para a
+         *     suspensão e devolve como o dono; `locatario` devolve como quem alugou;
+         *     `plataforma` devolve tudo e não conta.
+         */
+        CancelamentoAdminIn: {
+            /**
+             * Solicitado Por
+             * @enum {string}
+             */
+            solicitado_por: "dono" | "locatario" | "plataforma";
         };
         /** ChangeEmailIn */
         ChangeEmailIn: {
@@ -1098,6 +1339,11 @@ export interface components {
             id: string;
             /** Nome */
             nome: string;
+        };
+        /** ContestacaoIn */
+        ContestacaoIn: {
+            /** Texto */
+            texto: string;
         };
         /** ConviteLinkOut */
         ConviteLinkOut: {
@@ -1175,6 +1421,18 @@ export interface components {
             valor_dono_centavos: number;
             mais_barata: components["schemas"]["OpcaoOut"] | null;
         };
+        /** DecisaoNaoEntregaIn */
+        DecisaoNaoEntregaIn: {
+            /**
+             * Decisao
+             * @enum {string}
+             */
+            decisao: "total" | "parcial" | "nenhum";
+            /** Valor Centavos */
+            valor_centavos?: number | null;
+            /** Observacao */
+            observacao: string;
+        };
         /** DenunciaIn */
         DenunciaIn: {
             /**
@@ -1184,6 +1442,170 @@ export interface components {
             motivo: "pessoa" | "placa" | "conteudo_inadequado" | "nao_e_a_vaga" | "outro";
             /** Detalhe */
             detalhe?: string | null;
+        };
+        /**
+         * DenunciaNaoEntregaAdminOut
+         * @description Fila do admin: os dois lados, a foto e o histórico (D78).
+         */
+        DenunciaNaoEntregaAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Pedido Id
+             * Format: uuid
+             */
+            pedido_id: string;
+            /** Status */
+            status: string;
+            /**
+             * Desde
+             * Format: date-time
+             */
+            desde: string;
+            /** Relato */
+            relato: string | null;
+            /** Foto Status */
+            foto_status: string | null;
+            /**
+             * Prazo Dono Em
+             * Format: date-time
+             */
+            prazo_dono_em: string;
+            /** Resposta Dono */
+            resposta_dono: string | null;
+            /** Respondida Em */
+            respondida_em: string | null;
+            /** Contestacao */
+            contestacao: string | null;
+            /** Decisao */
+            decisao: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
+            /**
+             * Condominio Id
+             * Format: uuid
+             */
+            condominio_id: string;
+            vaga: components["schemas"]["VagaResumoOut"] | null;
+            pedido: components["schemas"]["PedidoResumoAdminOut"];
+            /** Revisao Admin */
+            revisao_admin: boolean;
+            /** Foto Url */
+            foto_url: string | null;
+            /** Decisao Observacao */
+            decisao_observacao: string | null;
+            historico: components["schemas"]["HistoricoNaoEntregaOut"];
+        };
+        /** DenunciaNaoEntregaCriadaOut */
+        DenunciaNaoEntregaCriadaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Pedido Id
+             * Format: uuid
+             */
+            pedido_id: string;
+            /** Status */
+            status: string;
+            /**
+             * Desde
+             * Format: date-time
+             */
+            desde: string;
+            /** Relato */
+            relato: string | null;
+            /** Foto Status */
+            foto_status: string | null;
+            /**
+             * Prazo Dono Em
+             * Format: date-time
+             */
+            prazo_dono_em: string;
+            /** Resposta Dono */
+            resposta_dono: string | null;
+            /** Respondida Em */
+            respondida_em: string | null;
+            /** Contestacao */
+            contestacao: string | null;
+            /** Decisao */
+            decisao: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
+            foto_upload: components["schemas"]["FotoUploadOut"] | null;
+        };
+        /** DenunciaNaoEntregaIn */
+        DenunciaNaoEntregaIn: {
+            /**
+             * Desde
+             * Format: date-time
+             */
+            desde: string;
+            /** Relato */
+            relato?: string | null;
+            foto?: components["schemas"]["FotoNaoEntregaIn"] | null;
+        };
+        /**
+         * DenunciaNaoEntregaOut
+         * @description O que quem alugou e o dono veem. Sem `revisao_admin` (D78).
+         */
+        DenunciaNaoEntregaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Pedido Id
+             * Format: uuid
+             */
+            pedido_id: string;
+            /** Status */
+            status: string;
+            /**
+             * Desde
+             * Format: date-time
+             */
+            desde: string;
+            /** Relato */
+            relato: string | null;
+            /** Foto Status */
+            foto_status: string | null;
+            /**
+             * Prazo Dono Em
+             * Format: date-time
+             */
+            prazo_dono_em: string;
+            /** Resposta Dono */
+            resposta_dono: string | null;
+            /** Respondida Em */
+            respondida_em: string | null;
+            /** Contestacao */
+            contestacao: string | null;
+            /** Decisao */
+            decisao: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
         };
         /**
          * DenunciaOut
@@ -1248,6 +1670,52 @@ export interface components {
              */
             email: string;
         };
+        /**
+         * EstornoAdminOut
+         * @description Fila de estornos recusados do admin (D81). Sem id do gateway.
+         */
+        EstornoAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Pedido Id
+             * Format: uuid
+             */
+            pedido_id: string;
+            /** Valor Centavos */
+            valor_centavos: number;
+            /** Motivo */
+            motivo: string;
+            /** Status */
+            status: string;
+            /** Tentativa */
+            tentativa: number;
+            /** Observacao */
+            observacao: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** FotoNaoEntregaIn */
+        FotoNaoEntregaIn: {
+            /**
+             * Content Type
+             * @enum {string}
+             */
+            content_type: "image/jpeg" | "image/png" | "image/webp";
+            /** Size Bytes */
+            size_bytes: number;
+        };
         /** FotoOut */
         FotoOut: {
             /**
@@ -1279,6 +1747,22 @@ export interface components {
              */
             aviso_confirmado: true;
         };
+        /** FotoUploadOut */
+        FotoUploadOut: {
+            /** Upload Url */
+            upload_url: string;
+            /** Upload Method */
+            upload_method: string;
+            /** Upload Headers */
+            upload_headers: {
+                [key: string]: string;
+            };
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1291,6 +1775,25 @@ export interface components {
              * @constant
              */
             status: "ok";
+        };
+        /** HistoricoDonoOut */
+        HistoricoDonoOut: {
+            /** Pontos Na Janela */
+            pontos_na_janela: number;
+            /** Nao Entregues Na Janela */
+            nao_entregues_na_janela: number;
+        };
+        /** HistoricoLocatarioOut */
+        HistoricoLocatarioOut: {
+            /** Denuncias Na Janela */
+            denuncias_na_janela: number;
+            /** Contestacoes Perdidas */
+            contestacoes_perdidas: number;
+        };
+        /** HistoricoNaoEntregaOut */
+        HistoricoNaoEntregaOut: {
+            locatario: components["schemas"]["HistoricoLocatarioOut"];
+            dono: components["schemas"]["HistoricoDonoOut"];
         };
         /** InviteEmailIn */
         InviteEmailIn: {
@@ -1429,6 +1932,8 @@ export interface components {
             status: string;
             /** Cancelado Por */
             cancelado_por: string | null;
+            /** Solicitado Por */
+            solicitado_por: string | null;
             /** Reembolso Centavos */
             reembolso_centavos: number | null;
         };
@@ -1582,6 +2087,67 @@ export interface components {
             reembolso_centavos: number | null;
             locatario: components["schemas"]["UnidadeResumoOut"];
         };
+        /** PedidoResumoAdminOut */
+        PedidoResumoAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Modalidade */
+            modalidade: string;
+            /** Quantidade */
+            quantidade: number;
+            /**
+             * Inicio
+             * Format: date-time
+             */
+            inicio: string;
+            /**
+             * Fim
+             * Format: date-time
+             */
+            fim: string;
+            /** Total Centavos */
+            total_centavos: number;
+            /** Taxa Centavos */
+            taxa_centavos: number;
+        };
+        /** PendenciaVinculoOut */
+        PendenciaVinculoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Pedido Id
+             * Format: uuid
+             */
+            pedido_id: string;
+            /**
+             * Condominio Id
+             * Format: uuid
+             */
+            condominio_id: string;
+            /** Motivo */
+            motivo: string;
+            /** Status */
+            status: string;
+            /** Responsavel */
+            responsavel: string;
+            /** Resolucao */
+            resolucao: string | null;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
+            /** Resolvida Em */
+            resolvida_em: string | null;
+        };
         /** PeriodoOut */
         PeriodoOut: {
             /**
@@ -1669,12 +2235,50 @@ export interface components {
             /** Telefone */
             telefone?: string | null;
         };
+        /**
+         * ReservaEncerradaOut
+         * @description Reserva encerrada por perda de vínculo, para o síndico (D77). Sem nome nem
+         *     placa: só a vaga, a unidade de quem alugou, o período e o reembolso.
+         */
+        ReservaEncerradaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            vaga: components["schemas"]["VagaResumoOut"];
+            unidade: components["schemas"]["UnidadeRefOut"];
+            /**
+             * Inicio
+             * Format: date-time
+             */
+            inicio: string;
+            /**
+             * Fim
+             * Format: date-time
+             */
+            fim: string;
+            /**
+             * Encerrado Em
+             * Format: date-time
+             */
+            encerrado_em: string;
+            /** Ja Tinha Comecado */
+            ja_tinha_comecado: boolean;
+            /** Reembolso Centavos */
+            reembolso_centavos: number;
+        };
         /** ResetPasswordIn */
         ResetPasswordIn: {
             /** Token */
             token: string;
             /** New Password */
             new_password: string;
+        };
+        /** ResolverEstornoIn */
+        ResolverEstornoIn: {
+            /** Observacao */
+            observacao: string;
         };
         /** SubcontaOut */
         SubcontaOut: {
@@ -1728,6 +2332,13 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Bloco */
+            bloco: string;
+            /** Numero */
+            numero: string;
+        };
+        /** UnidadeRefOut */
+        UnidadeRefOut: {
             /** Bloco */
             bloco: string;
             /** Numero */
@@ -4083,6 +4694,243 @@ export interface operations {
             };
         };
     };
+    ver_aviso_feito_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__vaga_indisponivel_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    avisar_vaga_nao_entregue_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__vaga_indisponivel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DenunciaNaoEntregaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaCriadaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    concluir_foto_nao_entregue_condominios__condominio_id__unidades__unidade_id__pedidos__pedido_id__vaga_indisponivel_foto_concluir_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ver_aviso_recebido_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__vaga_indisponivel_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmar_nao_entrega_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__vaga_indisponivel_confirmar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contestar_nao_entrega_condominios__condominio_id__unidades__unidade_id__pedidos_recebidos__pedido_id__vaga_indisponivel_contestar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pedido_id: string;
+                unidade_id: string;
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContestacaoIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reservas_encerradas_condominios__condominio_id__reservas_encerradas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                condominio_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservaEncerradaOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     placas_do_dia_condominios__condominio_id__portaria_placas_get: {
         parameters: {
             query?: never;
@@ -4123,7 +4971,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelamentoAdminIn"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -4132,6 +4984,202 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PedidoCanceladoAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pendencias_de_vinculo_admin_pendencias_vinculo_get: {
+        parameters: {
+            query?: {
+                status?: "aberta" | "resolvida";
+                condominio_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendenciaVinculoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fila_nao_entrega_admin_denuncias_nao_entrega_get: {
+        parameters: {
+            query?: {
+                status?: "aguardando_dono" | "aguardando_admin" | "procedente" | "improcedente";
+                condominio_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaAdminOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decidir_nao_entrega_admin_denuncias_nao_entrega__denuncia_id__decidir_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                denuncia_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisaoNaoEntregaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DenunciaNaoEntregaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estornos_recusados_admin_estornos_recusados_get: {
+        parameters: {
+            query?: {
+                condominio_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstornoAdminOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retentar_estorno_admin_estornos__estorno_id__retentar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                estorno_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstornoAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolver_estorno_admin_estornos__estorno_id__resolver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                estorno_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolverEstornoIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstornoAdminOut"];
                 };
             };
             /** @description Validation Error */
