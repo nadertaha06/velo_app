@@ -39,6 +39,8 @@ const base: PedidoFeito = {
   cancelado_em: null,
   cancelado_por: null,
   reembolso_centavos: null,
+  estorno_status: null,
+  feito_por_mim: true,
   dono: { primeiro_nome: 'Rafael', bloco: 'A', numero: '112' },
   pix_copia_cola: null,
 };
@@ -89,10 +91,25 @@ describe('PedidoScreen', () => {
     expect(screen.getByText(/cobrança em andamento/)).toBeOnTheScreen();
   });
 
-  it('cancelado mostra o reembolso que a API devolveu', async () => {
-    await show({ status: 'cancelado', cancelado_por: 'locatario', reembolso_centavos: 7125 });
-    expect(screen.getByText(/Você recebe R\$\s71,25 de volta/)).toBeOnTheScreen();
+  it('cancelado mostra o reembolso que a API devolveu, sem dizer que voltou antes da hora', async () => {
+    await show({ status: 'cancelado', cancelado_por: 'locatario', reembolso_centavos: 7125, estorno_status: 'em_processamento' });
+    expect(screen.getByText(/reembolso de R\$\s71,25 está em processamento/)).toBeOnTheScreen();
+    expect(screen.queryByText(/feito na forma de pagamento/)).toBeNull();
     expect(screen.queryByRole('button', { name: /Cancelar/ })).toBeNull();
+  });
+
+  it('estorno em análise e estorno feito (backend D89/D90)', async () => {
+    await show({ status: 'cancelado', cancelado_por: 'dono', reembolso_centavos: 7500, estorno_status: 'em_analise' });
+    expect(screen.getByText(/R\$\s75,00 está em análise/)).toBeOnTheScreen();
+    await screen.unmount();
+    await show({ status: 'cancelado', cancelado_por: 'dono', reembolso_centavos: 7500, estorno_status: 'feito' });
+    expect(screen.getByText(/Reembolso de R\$\s75,00 feito/)).toBeOnTheScreen();
+  });
+
+  it('pedido de outro morador: sem botão de cancelar, com o aviso', async () => {
+    await show({ status: 'confirmado', feito_por_mim: false });
+    expect(screen.queryByRole('button', { name: 'Cancelar pedido' })).toBeNull();
+    expect(screen.getByText(/feito por outro morador da sua unidade/)).toBeOnTheScreen();
   });
 
   it('cancelado sem valor a devolver', async () => {

@@ -80,3 +80,38 @@ export function formaPagamentoLabel(forma: string): string {
   if (forma === 'cartao') return 'Cartão';
   return forma;
 }
+
+export type EstornoStatus = 'em_processamento' | 'em_analise' | 'feito';
+
+/**
+ * Texto do reembolso a partir do que o backend devolve (D89/D90 do backend):
+ * `reembolso_centavos` é o valor devido; só `estorno_status = feito` diz que o
+ * dinheiro voltou. O app nunca mostra reembolso como concluído antes disso.
+ * `quem`: "Você" (quem fez o pedido) ou "Quem alugou" / "Quem fez o pedido".
+ */
+export function reembolsoTexto(
+  reembolsoCentavos: number | null | undefined,
+  estorno: EstornoStatus | null | undefined,
+  quem: string,
+  formatCents: (c: number) => string,
+): string | null {
+  if (reembolsoCentavos == null) return null;
+  if (reembolsoCentavos <= 0) return 'Não há valor a devolver.';
+  const valor = formatCents(reembolsoCentavos);
+  switch (estorno) {
+    case 'feito':
+      return `Reembolso de ${valor} feito na forma de pagamento usada.`;
+    case 'em_analise':
+      return `O reembolso de ${valor} está em análise pela equipe do Velo. ${quem} recebe o valor assim que a análise terminar.`;
+    case 'em_processamento':
+      return `O reembolso de ${valor} está em processamento com a operadora.`;
+    default:
+      return `${quem} tem ${valor} a receber de volta.`;
+  }
+}
+
+export const estornoBadge: Record<EstornoStatus, string> = {
+  em_processamento: 'Reembolso em processamento',
+  em_analise: 'Reembolso em análise',
+  feito: 'Reembolso feito',
+};

@@ -19,7 +19,7 @@ import { colors, radius, spacing } from '@/theme/tokens';
 
 import type { PedidoFeito } from './api';
 import { podeCancelar, useCancelarPedido, usePedido } from './hooks';
-import { formaPagamentoLabel, statusLabel, statusTone } from './labels';
+import { formaPagamentoLabel, reembolsoTexto, statusLabel, statusTone } from './labels';
 
 export function PedidoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -87,7 +87,7 @@ function cabecalho(p: PedidoFeito): { titulo: string; texto: string } {
         titulo: 'Vaga não entregue',
         texto:
           p.reembolso_centavos != null && p.reembolso_centavos > 0
-            ? `A reserva foi encerrada. Você recebe ${formatCents(p.reembolso_centavos)} de volta na forma de pagamento usada.`
+            ? `A reserva foi encerrada. ${reembolso(p)}`
             : 'A reserva foi encerrada. O reembolso segue a análise do aviso.',
       };
     default:
@@ -102,14 +102,16 @@ const CANCELADO_POR: Record<string, string> = {
   sistema: 'automaticamente, porque o vínculo com a unidade foi encerrado',
 };
 
-/** Reembolso: o valor vem do backend (`reembolso_centavos`); o app só mostra. */
+/** Reembolso: valor e andamento vêm do backend (`reembolso_centavos`, `estorno_status`). */
+function reembolso(p: PedidoFeito): string {
+  return reembolsoTexto(p.reembolso_centavos, p.estorno_status, p.feito_por_mim ? 'Você' : 'Quem fez o pedido', formatCents) ?? '';
+}
+
 function textoCancelado(p: PedidoFeito): string {
   const quem = p.cancelado_por ? CANCELADO_POR[p.cancelado_por] : null;
   const base = quem ? `Cancelado ${quem}.` : 'Este pedido foi cancelado.';
   if (p.reembolso_centavos == null) return base;
-  return p.reembolso_centavos > 0
-    ? `${base} Você recebe ${formatCents(p.reembolso_centavos)} de volta na forma de pagamento usada.`
-    : `${base} Não há valor a devolver.`;
+  return `${base} ${reembolso(p)}`;
 }
 
 function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
@@ -126,7 +128,8 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
     <Screen
       edges={['bottom']}
       footer={
-        podeCancelar(p.status) ? (
+        // Só quem fez o pedido cancela (backend D82); os outros moradores só acompanham.
+        p.feito_por_mim && podeCancelar(p.status) ? (
           confirmando ? (
             <>
               <AppText variant="small" tone="muted">
@@ -150,6 +153,12 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
     >
       <Badge label={statusLabel(p.status)} tone={statusTone(p.status)} />
       <AppText variant="titleLarge">{titulo}</AppText>
+      {!p.feito_por_mim ? (
+        <AppText variant="small" tone="subtle">
+          Pedido feito por outro morador da sua unidade. Só quem fez o pedido pode cancelar ou avisar
+          problema.
+        </AppText>
+      ) : null}
 
       {prazo ? (
         <Card>
