@@ -236,6 +236,50 @@ export interface paths {
         get: operations["me_me_get"];
         put?: never;
         post?: never;
+        /**
+         * Delete Me
+         * @description Exclui a conta (D93): senha atual obrigatória; bloqueada com reserva, aviso
+         *     de não entrega ou reembolso em andamento (409). Depois, anonimiza e encerra
+         *     todas as sessões.
+         */
+        delete: operations["delete_me_me_delete"];
+        options?: never;
+        head?: never;
+        /** Update Me */
+        patch: operations["update_me_me_patch"];
+        trace?: never;
+    };
+    "/me/data-export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Data Export */
+        get: operations["data_export_me_data_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/aceites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aceitar Termos
+         * @description Aceita a versão vigente de um documento (D94). Repetir não muda nada.
+         */
+        post: operations["aceitar_termos_me_aceites_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -270,6 +314,23 @@ export interface paths {
         put?: never;
         /** Change Email */
         post: operations["change_email_me_email_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/termos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Termos Vigentes */
+        get: operations["termos_vigentes_termos_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1281,6 +1342,49 @@ export interface components {
             /** Token */
             token: string;
         };
+        /** AceiteExport */
+        AceiteExport: {
+            /** Documento */
+            documento: string;
+            /** Versao */
+            versao: string;
+            /**
+             * Aceito Em
+             * Format: date-time
+             */
+            aceito_em: string;
+        };
+        /** AceiteIn */
+        AceiteIn: {
+            /**
+             * Documento
+             * @enum {string}
+             */
+            documento: "termos_uso" | "politica_privacidade";
+            /** Versao */
+            versao: string;
+        };
+        /** AvisoNaoEntregaExport */
+        AvisoNaoEntregaExport: {
+            /**
+             * Pedido Id
+             * Format: uuid
+             */
+            pedido_id: string;
+            /** Papel */
+            papel: string;
+            /** Status */
+            status: string;
+            /** Relato */
+            relato: string | null;
+            /** Contestacao */
+            contestacao: string | null;
+            /**
+             * Criado Em
+             * Format: date-time
+             */
+            criado_em: string;
+        };
         /**
          * CancelamentoAdminIn
          * @description Quem pediu o cancelamento ao admin decide a regra (D75): `dono` conta para a
@@ -1339,6 +1443,27 @@ export interface components {
             id: string;
             /** Nome */
             nome: string;
+        };
+        /** ContaExport */
+        ContaExport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nome */
+            nome: string;
+            /** Email */
+            email: string;
+            /** Telefone */
+            telefone: string | null;
+            /** Email Verificado Em */
+            email_verificado_em: string | null;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
         };
         /** ContestacaoIn */
         ContestacaoIn: {
@@ -1421,6 +1546,33 @@ export interface components {
             valor_dono_centavos: number;
             mais_barata: components["schemas"]["OpcaoOut"] | null;
         };
+        /** DataExportOut */
+        DataExportOut: {
+            /**
+             * Gerado Em
+             * Format: date-time
+             */
+            gerado_em: string;
+            conta: components["schemas"]["ContaExport"];
+            /** Aceites */
+            aceites: components["schemas"]["AceiteExport"][];
+            /** Vinculos */
+            vinculos: components["schemas"]["VinculoExport"][];
+            /** Veiculos */
+            veiculos: components["schemas"]["VeiculoExport"][];
+            /** Pedidos Feitos */
+            pedidos_feitos: components["schemas"]["PedidoExport"][];
+            /** Avisos Nao Entrega */
+            avisos_nao_entrega: components["schemas"]["AvisoNaoEntregaExport"][];
+            /** Denuncias De Foto */
+            denuncias_de_foto: components["schemas"]["DenunciaFotoExport"][];
+            /** Subcontas */
+            subcontas: components["schemas"]["SubcontaExport"][];
+            /** Sessoes */
+            sessoes: components["schemas"]["SessaoExport"][];
+            /** Registros De Acesso */
+            registros_de_acesso: components["schemas"]["RegistroAcessoExport"][];
+        };
         /** DecisaoNaoEntregaIn */
         DecisaoNaoEntregaIn: {
             /**
@@ -1432,6 +1584,30 @@ export interface components {
             valor_centavos?: number | null;
             /** Observacao */
             observacao: string;
+        };
+        /** DeleteMeIn */
+        DeleteMeIn: {
+            /** Password */
+            password: string;
+        };
+        /** DenunciaFotoExport */
+        DenunciaFotoExport: {
+            /**
+             * Foto Id
+             * Format: uuid
+             */
+            foto_id: string;
+            /** Motivo */
+            motivo: string;
+            /** Detalhe */
+            detalhe: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
         };
         /** DenunciaIn */
         DenunciaIn: {
@@ -1498,6 +1674,8 @@ export interface components {
             pedido: components["schemas"]["PedidoResumoAdminOut"];
             /** Revisao Admin */
             revisao_admin: boolean;
+            /** Prazo Admin Em */
+            prazo_admin_em: string | null;
             /** Foto Url */
             foto_url: string | null;
             /** Decisao Observacao */
@@ -1706,6 +1884,20 @@ export interface components {
              */
             updated_at: string;
         };
+        /** EstornoExport */
+        EstornoExport: {
+            /** Valor Centavos */
+            valor_centavos: number;
+            /** Motivo */
+            motivo: string;
+            /** Status */
+            status: string;
+            /**
+             * Criado Em
+             * Format: date-time
+             */
+            criado_em: string;
+        };
         /** FotoNaoEntregaIn */
         FotoNaoEntregaIn: {
             /**
@@ -1827,6 +2019,19 @@ export interface components {
             email_verificado: boolean;
             /** Vinculos */
             vinculos: components["schemas"]["MeuVinculoOut"][];
+            /** Termos Pendentes */
+            termos_pendentes: components["schemas"]["TermoPendenteOut"][];
+        };
+        /**
+         * MeUpdateIn
+         * @description Correção dos dados (LGPD, D93). E-mail tem rota própria (`POST /me/email`),
+         *     com senha e verificação. `telefone: null` apaga o telefone.
+         */
+        MeUpdateIn: {
+            /** Nome */
+            nome?: string | null;
+            /** Telefone */
+            telefone?: string | null;
         };
         /**
          * MembroOut
@@ -1912,6 +2117,20 @@ export interface components {
             /** Total Centavos */
             total_centavos: number;
         };
+        /** PagamentoExport */
+        PagamentoExport: {
+            /** Forma */
+            forma: string;
+            /** Status */
+            status: string;
+            /** Valor Centavos */
+            valor_centavos: number;
+            /**
+             * Criado Em
+             * Format: date-time
+             */
+            criado_em: string;
+        };
         /** PapelOut */
         PapelOut: {
             /** Papel */
@@ -1936,6 +2155,56 @@ export interface components {
             solicitado_por: string | null;
             /** Reembolso Centavos */
             reembolso_centavos: number | null;
+        };
+        /** PedidoExport */
+        PedidoExport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Condominio Id
+             * Format: uuid
+             */
+            condominio_id: string;
+            /** Vaga Numero */
+            vaga_numero: string;
+            /** Vaga Andar */
+            vaga_andar: string;
+            /** Modalidade */
+            modalidade: string;
+            /** Quantidade */
+            quantidade: number;
+            /** Inicio */
+            inicio: string | null;
+            /** Fim */
+            fim: string | null;
+            /** Total Centavos */
+            total_centavos: number;
+            /** Taxa Centavos */
+            taxa_centavos: number;
+            /** Forma Pagamento */
+            forma_pagamento: string;
+            /** Status */
+            status: string;
+            /** Mensagem */
+            mensagem: string | null;
+            /** Cancelado Em */
+            cancelado_em: string | null;
+            /** Cancelado Por */
+            cancelado_por: string | null;
+            /** Reembolso Centavos */
+            reembolso_centavos: number | null;
+            /**
+             * Criado Em
+             * Format: date-time
+             */
+            criado_em: string;
+            /** Pagamentos */
+            pagamentos: components["schemas"]["PagamentoExport"][];
+            /** Estornos */
+            estornos: components["schemas"]["EstornoExport"][];
         };
         /**
          * PedidoFeitoOut
@@ -1992,7 +2261,11 @@ export interface components {
             cancelado_por: string | null;
             /** Reembolso Centavos */
             reembolso_centavos: number | null;
+            /** Estorno Status */
+            estorno_status: ("em_processamento" | "em_analise" | "feito") | null;
             dono: components["schemas"]["UnidadeResumoOut"];
+            /** Feito Por Mim */
+            feito_por_mim: boolean;
             /** Pix Copia Cola */
             pix_copia_cola: string | null;
         };
@@ -2085,6 +2358,8 @@ export interface components {
             cancelado_por: string | null;
             /** Reembolso Centavos */
             reembolso_centavos: number | null;
+            /** Estorno Status */
+            estorno_status: ("em_processamento" | "em_analise" | "feito") | null;
             locatario: components["schemas"]["UnidadeResumoOut"];
         };
         /** PedidoResumoAdminOut */
@@ -2234,6 +2509,22 @@ export interface components {
             nome: string;
             /** Telefone */
             telefone?: string | null;
+            /** Aceite Termos Uso */
+            aceite_termos_uso: string;
+            /** Aceite Politica Privacidade */
+            aceite_politica_privacidade: string;
+        };
+        /** RegistroAcessoExport */
+        RegistroAcessoExport: {
+            /** Acao */
+            acao: string;
+            /** Ip */
+            ip: string;
+            /**
+             * Em
+             * Format: date-time
+             */
+            em: string;
         };
         /**
          * ReservaEncerradaOut
@@ -2280,6 +2571,26 @@ export interface components {
             /** Observacao */
             observacao: string;
         };
+        /** SessaoExport */
+        SessaoExport: {
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
+            /** Revogada Em */
+            revogada_em: string | null;
+        };
+        /** SubcontaExport */
+        SubcontaExport: {
+            /** Status */
+            status: string;
+            /**
+             * Criada Em
+             * Format: date-time
+             */
+            criada_em: string;
+        };
         /** SubcontaOut */
         SubcontaOut: {
             /**
@@ -2289,6 +2600,23 @@ export interface components {
             status: "nao_cadastrada" | "pendente" | "ativa" | "recusada";
             /** Onboarding Url */
             onboarding_url: string | null;
+        };
+        /** TermoPendenteOut */
+        TermoPendenteOut: {
+            /**
+             * Documento
+             * @enum {string}
+             */
+            documento: "termos_uso" | "politica_privacidade";
+            /** Versao */
+            versao: string;
+        };
+        /** TermosVigentesOut */
+        TermosVigentesOut: {
+            /** Termos Uso */
+            termos_uso: string;
+            /** Politica Privacidade */
+            politica_privacidade: string;
         };
         /** TokenIn */
         TokenIn: {
@@ -2540,6 +2868,25 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /** VeiculoExport */
+        VeiculoExport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Placa */
+            placa: string;
+            /** Modelo */
+            modelo: string;
+            /** Porte */
+            porte: string;
+            /**
+             * Criado Em
+             * Format: date-time
+             */
+            criado_em: string;
+        };
         /** VeiculoIn */
         VeiculoIn: {
             /** Placa */
@@ -2583,6 +2930,33 @@ export interface components {
             placa: string | null;
             /** Modelo */
             modelo: string | null;
+        };
+        /** VinculoExport */
+        VinculoExport: {
+            /**
+             * Condominio Id
+             * Format: uuid
+             */
+            condominio_id: string;
+            /** Condominio Nome */
+            condominio_nome: string;
+            /** Papel */
+            papel: string;
+            /** Bloco */
+            bloco: string | null;
+            /** Numero */
+            numero: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Criado Em
+             * Format: date-time
+             */
+            criado_em: string;
+            /** Ativado Em */
+            ativado_em: string | null;
+            /** Removido Em */
+            removido_em: string | null;
         };
         /** VinculoOut */
         VinculoOut: {
@@ -2998,6 +3372,121 @@ export interface operations {
             };
         };
     };
+    delete_me_me_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteMeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_me_me_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    data_export_me_data_export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExportOut"];
+                };
+            };
+        };
+    };
+    aceitar_termos_me_aceites_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AceiteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     change_password_me_password_post: {
         parameters: {
             query?: never;
@@ -3058,6 +3547,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    termos_vigentes_termos_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TermosVigentesOut"];
                 };
             };
         };
