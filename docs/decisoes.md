@@ -372,6 +372,7 @@ nunca é mostrado.
   reservas futuras canceladas com reembolso integral).
 
 ### D24. Anunciar vaga: ordem dos passos
+**Aceito por você em 2026-11-27.**
 - O design põe as fotos no passo 2 de 4. A API só aceita foto de vaga que já
   existe, e a criação exige dados, preços e modo de aprovação juntos. Por isso:
   1. dados; 2. preços e aprovação (cria a vaga **pausada**, `ativa: false`);
@@ -414,10 +415,31 @@ nunca é mostrado.
   `app.json`.
 
 ### D27. O que falta no backend (não contornado no app)
-- **Indicador de aviso aberto nas listas:** `PedidoRecebidoOut` (e
+- ~~**Indicador de aviso aberto nas listas:**~~ **resolvido pela D28** (D98 do
+  backend). Texto original: `PedidoRecebidoOut` (e
   `PedidoFeitoOut`) não dizem se há aviso de vaga não entregue. O app só descobre
   no detalhe (`GET .../vaga-indisponivel`, 404 = não há). Com prazo curto (60 min
   padrão), o responsável pode não ver a tempo. Pedido: campo como
   `aviso_nao_entrega: {status, prazo_dono_em} | null` nos dois schemas (e, depois,
   push).
 - **Texto dos termos e da política** (D22).
+
+## 2026-11-27 — revisão da etapa 3
+
+### D28. Aviso de vaga não entregue nas listas (D98 do backend)
+- O backend passou a mandar `aviso_nao_entregue_aberto` e `aviso_prazo_ate` nos
+  pedidos. Na aba **Recebidos**, o pedido com aviso ganha o badge "Vaga não
+  entregue · responda" e o contador até `aviso_prazo_ate`, e entra em "Esperando
+  sua resposta". Com o aviso na análise do admin (sem prazo), o badge diz "em
+  análise", sem contador.
+- Em "Minhas reservas", uma linha "Aviso de vaga não entregue em andamento".
+
+### D29. Cliente gerado: provisório até os merges no backend
+- O `schema.d.ts` desta branch foi gerado da `feat/d27-aviso-nas-listas@04f9e76`
+  do backend (que contém `feat/refactor-ciclos` e `feat/etapa-7`). Ordem
+  combinada: os merges no backend (refactor-ciclos, etapa-7, D27) só com sua
+  autorização; depois, `gen:api` e `check:api-drift` contra a `main` do backend, e
+  só então esta branch.
+- O `DELETE /me` do backend passou a responder `202` com
+  `{"status": "anonimizada" | "exclusao_pendente"}` (D97 dele). O app ainda não
+  usa essa rota (Perfil, etapa 4).
