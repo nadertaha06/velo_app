@@ -238,9 +238,9 @@ export interface paths {
         post?: never;
         /**
          * Delete Me
-         * @description Exclui a conta (D93): senha atual obrigatória; bloqueada com reserva, aviso
-         *     de não entrega ou reembolso em andamento (409). Depois, anonimiza e encerra
-         *     todas as sessões.
+         * @description Exclui a conta (D93, D97): senha atual obrigatória; bloqueada com reserva ou
+         *     aviso de não entrega em andamento (409). Com estorno a caminho, a conta é
+         *     desligada na hora e anonimizada quando ele terminar.
          */
         delete: operations["delete_me_me_delete"];
         options?: never;
@@ -1898,6 +1898,14 @@ export interface components {
              */
             criado_em: string;
         };
+        /** ExclusaoOut */
+        ExclusaoOut: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "anonimizada" | "exclusao_pendente";
+        };
         /** FotoNaoEntregaIn */
         FotoNaoEntregaIn: {
             /**
@@ -2263,6 +2271,10 @@ export interface components {
             reembolso_centavos: number | null;
             /** Estorno Status */
             estorno_status: ("em_processamento" | "em_analise" | "feito") | null;
+            /** Aviso Nao Entregue Aberto */
+            aviso_nao_entregue_aberto: boolean;
+            /** Aviso Prazo Ate */
+            aviso_prazo_ate: string | null;
             dono: components["schemas"]["UnidadeResumoOut"];
             /** Feito Por Mim */
             feito_por_mim: boolean;
@@ -2360,6 +2372,10 @@ export interface components {
             reembolso_centavos: number | null;
             /** Estorno Status */
             estorno_status: ("em_processamento" | "em_analise" | "feito") | null;
+            /** Aviso Nao Entregue Aberto */
+            aviso_nao_entregue_aberto: boolean;
+            /** Aviso Prazo Ate */
+            aviso_prazo_ate: string | null;
             locatario: components["schemas"]["UnidadeResumoOut"];
         };
         /** PedidoResumoAdminOut */
@@ -3386,11 +3402,13 @@ export interface operations {
         };
         responses: {
             /** @description Successful Response */
-            204: {
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExclusaoOut"];
+                };
             };
             /** @description Validation Error */
             422: {
