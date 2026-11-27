@@ -314,4 +314,110 @@ nunca é mostrado.
     (`report_in_progress`), e com a confirmação do dono o pedido vai a
     `nao_entregue` com 100% de reembolso para diária;
   - estorno de uma cobrança criada pelo `seed-dev`: aceito pelo servidor, graças ao
-    fake em arquivo do backend (D82 dele).
+    fake em arquivo do backend (D91 dele; era D82 na branch do seed).
+
+## 2026-11-27 — etapa 3
+
+### D19. Sincronização com o backend `feat/refactor-ciclos@74ed866`
+- `gen:api` a partir do OpenAPI desse commit (worktree temporária, só o código
+  commitado). `check:api-drift` com `BACKEND_DIR=<repo do backend>` e
+  `BACKEND_REF=feat/refactor-ciclos` dá ok. (Da worktree do app, `../velo_backend`
+  não existe; por isso o `BACKEND_DIR`.)
+- O que mudou no contrato e o app passou a usar:
+  - `feito_por_mim` em `PedidoFeitoOut` (D82 do backend): fecha a lacuna da D16;
+  - `estorno_status` nos pedidos (D89/D90 do backend);
+  - aceite dos termos no cadastro, `GET /termos`, `POST /me/aceites` e
+    `termos_pendentes` em `GET /me` (D94 do backend);
+  - `PATCH /me`, `GET /me/data-export` e `DELETE /me` (D93 do backend): ficam para
+    o Perfil da etapa 4.
+- A numeração do backend mudou no merge do seed: as decisões do seed citadas aqui
+  como "D82 dele" viraram D91 e D92 lá.
+
+### D20. `feito_por_mim` (fecha a D16)
+- "Minhas reservas" separa "Meus pedidos" de "De outros moradores da unidade".
+- No pedido de outro morador, sem botão de cancelar nem de avisar vaga não
+  entregue, com o texto "Pedido feito por outro morador da sua unidade". O 404 do
+  backend continua tratado (a permissão é dele).
+
+### D21. Status do estorno
+- O texto do reembolso sai de `reembolsoTexto` (`src/features/pedidos/labels.ts`),
+  usado pelas duas visões: `em_processamento` → "está em processamento",
+  `em_analise` → "está em análise pela equipe do Velo", `feito` → "Reembolso de
+  R$ X feito". Sem status e com valor (dado antigo): "tem R$ X a receber". Nunca
+  "você recebe" antes de `feito`.
+- Nas listas, uma linha "Reembolso em processamento / em análise / feito".
+
+### D22. Termos e política
+- Cadastro: caixa "Li e aceito os Termos de uso (versão X) e a Política de
+  privacidade (versão Y)", com as versões de `GET /termos`. Sem marcar, o botão
+  fica desligado. `terms_version_outdated` (saiu versão nova com a tela aberta):
+  desmarca e busca as versões de novo.
+- Versão nova depois do cadastro: o `VinculoGate` mostra "Atualizamos nossos
+  termos" quando `termos_pendentes` não está vazio. Um 403
+  `terms_acceptance_required` em qualquer consulta recarrega o `/me`, e o gate
+  aparece.
+- **Pendente (produto/jurídico):** o texto dos dois documentos e onde o app os
+  abre. Hoje a caixa cita só nome e versão.
+
+### D23. Navegação da etapa 3
+- Aba **Recebidos** só para o responsável (`href: null` para os outros papéis).
+  A lista consulta a cada 15 s com a tela aberta (ainda sem push), e os pedidos
+  esperando resposta vêm primeiro, com contador.
+- **Minha unidade** pelo Perfil (só responsável): vaga da unidade, membros e
+  convites. Membros e convites são só do responsável no backend.
+- Convite de membro: e-mail opcional (com e-mail, o backend envia); o link só fica
+  em memória e vai para a folha de compartilhar do iOS. "Gerar link novo" usa o
+  reenviar (o link anterior para de valer).
+- Remover membro pede confirmação com a regra do backend (perde o acesso na hora;
+  reservas futuras canceladas com reembolso integral).
+
+### D24. Anunciar vaga: ordem dos passos
+- O design põe as fotos no passo 2 de 4. A API só aceita foto de vaga que já
+  existe, e a criação exige dados, preços e modo de aprovação juntos. Por isso:
+  1. dados; 2. preços e aprovação (cria a vaga **pausada**, `ativa: false`);
+  3. fotos; 4. disponibilidade e "Publicar vaga" (`ativa: true`).
+- Editar usa as mesmas telas, com atalhos 1–4 no topo, e "Pausar anúncio".
+- Preço digitado em reais vira centavos inteiros por texto, sem float
+  (`reaisParaCentavos`): "25,50", "25.50" e "1.250,00" são aceitos.
+- Modalidade desligada vai como `null`. Pelo menos uma precisa estar ligada (o
+  backend também confere).
+- Disponibilidade: de um dia a outro, inclusive, digitados como DD/MM/AAAA (não há
+  seletor de data nas dependências da spec): [00:00 do primeiro dia, 00:00 do dia
+  seguinte ao último) em São Paulo, enviado em UTC.
+- Fotos: o aviso do design ("Fotografe só a vaga vazia", com os três itens) e a
+  caixa "Entendi. Minhas fotos mostram só a vaga vazia." vêm antes; câmera e
+  galeria ficam desligadas até marcar. Toda foto vira JPEG (lado maior 2048,
+  qualidade 0,8) com `expo-image-manipulator` e sobe para a URL assinada com o
+  método e os cabeçalhos que a API devolveu. A primeira é a capa. Foto recusada
+  pelo processamento do backend aparece como erro.
+- Sem subconta ativa, a vaga não vai ao ar (D65 do backend): a tela diz isso. O
+  cadastro da subconta fica para o pagamento real (etapa 5).
+- Os textos da taxa não citam a porcentagem (a regra é do backend); o pedido
+  mostra o valor da taxa e o que o dono recebe.
+
+### D25. Vaga não entregue (D78 do backend)
+- **Quem alugou** (só quem fez o pedido, em `confirmado` ou `em_uso`): "A vaga não
+  estava livre" abre o aviso, com "desde quando" (agora, há 15 min, há 30 min, há
+  1 h, pelo relógio do servidor), relato e foto opcionais. A janela (diária: até
+  2 h do início) quem confere é o backend, e o erro aparece como veio. Com o aviso
+  aberto, o botão de cancelar some (o backend recusa com `report_in_progress`).
+  A foto segue o caminho da D24; se ela falhar, o aviso vale sem ela e a tela diz
+  isso.
+- **Responsável:** no pedido recebido, o cartão do aviso com o relato, o contador
+  do prazo e "Confirmar que estava ocupada" ou "Contestar" (texto obrigatório,
+  até 500). Sem resposta, vale o aviso (texto do backend).
+- Os dois lados veem o resultado: em análise, aceito (com o reembolso), não aceito.
+
+### D26. Dependências
+- `expo-image-picker` e `expo-image-manipulator` (seção 1 da spec), instaladas com
+  `npx expo install` nas versões do SDK 58, com os textos de permissão no
+  `app.json`.
+
+### D27. O que falta no backend (não contornado no app)
+- **Indicador de aviso aberto nas listas:** `PedidoRecebidoOut` (e
+  `PedidoFeitoOut`) não dizem se há aviso de vaga não entregue. O app só descobre
+  no detalhe (`GET .../vaga-indisponivel`, 404 = não há). Com prazo curto (60 min
+  padrão), o responsável pode não ver a tempo. Pedido: campo como
+  `aviso_nao_entrega: {status, prazo_dono_em} | null` nos dois schemas (e, depois,
+  push).
+- **Texto dos termos e da política** (D22).
