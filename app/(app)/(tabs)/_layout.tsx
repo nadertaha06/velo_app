@@ -1,10 +1,13 @@
-import { CalendarCheck, Search, User } from 'lucide-react-native';
+import { CalendarCheck, Inbox, Search, User } from 'lucide-react-native';
 import { Tabs } from 'expo-router';
 
+import { useActiveVinculo } from '@/features/vinculo/useActiveVinculo';
 import { colors } from '@/theme/tokens';
 import { fontFamily } from '@/theme/typography';
 
 export default function TabsLayout() {
+  // Pedidos recebidos: só o responsável vê a aba (conforto; a permissão real é do backend).
+  const responsavel = useActiveVinculo().papel === 'responsavel';
   return (
     <Tabs
       screenOptions={{
@@ -22,6 +25,14 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="reservas"
         options={{ title: 'Reservas', tabBarIcon: ({ color, size }) => <CalendarCheck color={color} size={size} /> }}
+      />
+      <Tabs.Screen
+        name="recebidos"
+        options={{
+          title: 'Recebidos',
+          href: responsavel ? undefined : null,
+          tabBarIcon: ({ color, size }) => <Inbox color={color} size={size} />,
+        }}
       />
       <Tabs.Screen
         name="perfil"

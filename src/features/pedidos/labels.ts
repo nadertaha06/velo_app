@@ -115,3 +115,7 @@ export const estornoBadge: Record<EstornoStatus, string> = {
   em_analise: 'Reembolso em análise',
   feito: 'Reembolso feito',
 };
+
+export function isPorte(v: string): v is Porte {
+  return (PORTES as readonly string[]).includes(v);
+}
