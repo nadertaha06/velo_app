@@ -12,6 +12,9 @@ export const authApi = {
     password: string;
     nome: string;
     telefone?: string | null;
+    /** Versões vigentes que a pessoa aceitou na tela (backend D94). */
+    aceite_termos_uso: string;
+    aceite_politica_privacidade: string;
   }) {
     return unwrap(api.POST('/auth/register', { body }));
   },

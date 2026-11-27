@@ -1,17 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { userMessage } from '@/api/errors';
+import { isApiError, userMessage } from '@/api/errors';
 import { AppText } from '@/components/AppText';
 import { VeloLogo } from '@/components/brand/VeloLogo';
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { DevLinkField } from '@/components/DevLinkField';
 import { FormMessage } from '@/components/FormMessage';
 import { Screen } from '@/components/Screen';
 import { TextField } from '@/components/TextField';
+import { termosApi } from '@/features/termos/api';
 
 import { authApi } from './api';
 import { pendingEmail } from './pendingEmail';
@@ -23,6 +25,9 @@ const FIELD_MAP = { nome: 'nome', email: 'email', telefone: 'telefone', password
 export function RegisterScreen() {
   // Token do convite: só em memória, só para esta requisição (spec, seção 5).
   const [inviteToken, setInviteToken] = useState<string | null>(null);
+  // Versões vigentes dos termos e da política (backend D94): o cadastro manda as aceitas.
+  const termos = useQuery({ queryKey: ['termos'], queryFn: termosApi.vigentes });
+  const [aceito, setAceito] = useState(false);
   const { control, handleSubmit, formState, setError } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: { nome: '', email: '', telefone: '', password: '' },
@@ -35,13 +40,22 @@ export function RegisterScreen() {
         email: v.email,
         telefone: v.telefone || null,
         password: v.password,
+        aceite_termos_uso: termos.data?.termos_uso ?? '',
+        aceite_politica_privacidade: termos.data?.politica_privacidade ?? '',
       }),
     onSuccess: (_res, v) => {
       setInviteToken(null);
       pendingEmail.set(v.email);
       router.replace('/verificar-email');
     },
-    onError: (err) => applyFieldErrors(err, setError, FIELD_MAP),
+    onError: (err) => {
+      applyFieldErrors(err, setError, FIELD_MAP);
+      // Saiu versão nova enquanto a tela estava aberta: busca de novo e pede o aceite outra vez.
+      if (isApiError(err, 'terms_version_outdated')) {
+        setAceito(false);
+        void termos.refetch();
+      }
+    },
   });
 
   return (
@@ -118,9 +132,20 @@ export function RegisterScreen() {
           />
         )}
       />
+      <Checkbox
+        label={
+          termos.data
+            ? `Li e aceito os Termos de uso (versão ${termos.data.termos_uso}) e a Política de privacidade (versão ${termos.data.politica_privacidade}).`
+            : 'Li e aceito os Termos de uso e a Política de privacidade.'
+        }
+        checked={aceito}
+        onChange={setAceito}
+        disabled={!termos.data}
+      />
+      {termos.isError ? <FormMessage message={userMessage(termos.error)} /> : null}
       <Button
         label="Criar conta"
-        disabled={!inviteToken}
+        disabled={!inviteToken || !aceito || !termos.data}
         loading={register.isPending}
         onPress={handleSubmit((v) => register.mutate(v))}
       />
