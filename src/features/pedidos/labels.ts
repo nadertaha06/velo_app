@@ -81,7 +81,7 @@ export function formaPagamentoLabel(forma: string): string {
   return forma;
 }
 
-export type EstornoStatus = 'em_processamento' | 'em_analise' | 'feito';
+export type EstornoStatus = 'em_processamento' | 'em_analise' | 'nao_aprovado' | 'feito';
 
 /**
  * Texto do reembolso a partir do que o backend devolve (D89/D90 do backend):
@@ -105,6 +105,9 @@ export function reembolsoTexto(
       return `O reembolso de ${valor} está em análise pela equipe do Velo. ${quem} recebe o valor assim que a análise terminar.`;
     case 'em_processamento':
       return `O reembolso de ${valor} está em processamento com a operadora.`;
+    case 'nao_aprovado':
+      // O admin decidiu não devolver (backend D100).
+      return `O reembolso de ${valor} não foi aprovado pela equipe do Velo.`;
     default:
       return `${quem} tem ${valor} a receber de volta.`;
   }
@@ -113,6 +116,7 @@ export function reembolsoTexto(
 export const estornoBadge: Record<EstornoStatus, string> = {
   em_processamento: 'Reembolso em processamento',
   em_analise: 'Reembolso em análise',
+  nao_aprovado: 'Reembolso não aprovado',
   feito: 'Reembolso feito',
 };
 
