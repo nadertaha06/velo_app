@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
@@ -11,6 +12,7 @@ import { Button } from '@/components/Button';
 import { FormMessage } from '@/components/FormMessage';
 import { Screen } from '@/components/Screen';
 import { TextField } from '@/components/TextField';
+import { contaExcluida, mensagemExclusao } from '@/features/conta/contaExcluida';
 import { spacing } from '@/theme/tokens';
 
 import { authApi } from './api';
@@ -18,6 +20,8 @@ import { pendingEmail } from './pendingEmail';
 import { loginSchema, type LoginForm } from './schemas';
 
 export function LoginScreen() {
+  // Voltou ao login depois de excluir a conta: mostra o resultado uma vez.
+  const [exclusao] = useState(() => contaExcluida.take());
   const { control, handleSubmit, formState } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
@@ -37,6 +41,7 @@ export function LoginScreen() {
 
   return (
     <Screen title="Entrar" header={<VeloLogo />}>
+      {exclusao ? <FormMessage tone="info" message={mensagemExclusao(exclusao)} /> : null}
       <AppText tone="muted">Use o e-mail e a senha da sua conta.</AppText>
       <FormMessage message={error} />
       <Controller

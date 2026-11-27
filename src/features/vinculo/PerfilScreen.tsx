@@ -40,6 +40,7 @@ export function PerfilScreen() {
       ) : null}
       <Button variant="ghost" label="Aceitar outro convite" onPress={() => router.push('/aceitar-convite')} />
       <Button variant="ghost" label="Sair" onPress={() => void session.signOut()} />
+      <Button variant="ghost" label="Excluir conta" onPress={() => router.push('/excluir-conta')} />
     </Screen>
   );
 }
