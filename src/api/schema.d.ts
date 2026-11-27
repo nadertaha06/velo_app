@@ -1315,6 +1315,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/estornos-em-disputa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Estornos Em Disputa
+         * @description Fila do admin: estornos não devolvidos com a disputa aberta (D100).
+         */
+        get: operations["estornos_em_disputa_admin_estornos_em_disputa_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/estornos/{estorno_id}/encerrar-disputa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Encerrar Disputa */
+        post: operations["encerrar_disputa_admin_estornos__estorno_id__encerrar_disputa_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/condominios/{condominio_id}/unidades/{unidade_id}/subconta": {
         parameters: {
             query?: never;
@@ -1848,6 +1885,11 @@ export interface components {
              */
             email: string;
         };
+        /** EncerrarDisputaIn */
+        EncerrarDisputaIn: {
+            /** Observacao */
+            observacao: string;
+        };
         /**
          * EstornoAdminOut
          * @description Fila de estornos recusados do admin (D81). Sem id do gateway.
@@ -1873,6 +1915,10 @@ export interface components {
             tentativa: number;
             /** Observacao */
             observacao: string | null;
+            /** Desfecho Manual */
+            desfecho_manual: string | null;
+            /** Disputa Encerrada Em */
+            disputa_encerrada_em: string | null;
             /**
              * Created At
              * Format: date-time
@@ -2270,7 +2316,7 @@ export interface components {
             /** Reembolso Centavos */
             reembolso_centavos: number | null;
             /** Estorno Status */
-            estorno_status: ("em_processamento" | "em_analise" | "feito") | null;
+            estorno_status: ("em_processamento" | "em_analise" | "nao_aprovado" | "feito") | null;
             /** Aviso Nao Entregue Aberto */
             aviso_nao_entregue_aberto: boolean;
             /** Aviso Prazo Ate */
@@ -2371,7 +2417,7 @@ export interface components {
             /** Reembolso Centavos */
             reembolso_centavos: number | null;
             /** Estorno Status */
-            estorno_status: ("em_processamento" | "em_analise" | "feito") | null;
+            estorno_status: ("em_processamento" | "em_analise" | "nao_aprovado" | "feito") | null;
             /** Aviso Nao Entregue Aberto */
             aviso_nao_entregue_aberto: boolean;
             /** Aviso Prazo Ate */
@@ -2586,6 +2632,11 @@ export interface components {
         ResolverEstornoIn: {
             /** Observacao */
             observacao: string;
+            /**
+             * Desfecho
+             * @enum {string}
+             */
+            desfecho: "devolvido" | "nao_devolvido";
         };
         /** SessaoExport */
         SessaoExport: {
@@ -5697,6 +5748,72 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ResolverEstornoIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstornoAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estornos_em_disputa_admin_estornos_em_disputa_get: {
+        parameters: {
+            query?: {
+                condominio_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstornoAdminOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    encerrar_disputa_admin_estornos__estorno_id__encerrar_disputa_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                estorno_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EncerrarDisputaIn"];
             };
         };
         responses: {
