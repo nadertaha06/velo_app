@@ -12,6 +12,12 @@ jest.mock('react-native-safe-area-context', () => {
   const { View } = jest.requireActual('react-native');
   return { SafeAreaView: View };
 });
+jest.mock('@/features/naoEntrega/hooks', () => ({
+  useAviso: () => ({ isSuccess: true, data: null }),
+}));
+jest.mock('@/features/vinculo/useActiveVinculo', () => ({
+  useActiveVinculo: () => ({ condominio_id: 'c1', unidade_id: 'u1', papel: 'responsavel' }),
+}));
 jest.mock('../hooks', () => ({
   ...jest.requireActual('../hooks'),
   usePedido: jest.fn(),

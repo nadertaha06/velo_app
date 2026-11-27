@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
@@ -15,6 +15,9 @@ import { Screen } from '@/components/Screen';
 import { formatCents, formatDateTime, formatPeriod } from '@/lib/format';
 import { serverNow } from '@/lib/serverClock';
 import { vagaTitulo } from '@/features/explorar/VagaCard';
+import { avisoAberto, podeAvisar, podeTerAviso } from '@/features/naoEntrega/api';
+import { AvisoLocatarioCard } from '@/features/naoEntrega/AvisoCard';
+import { useAviso } from '@/features/naoEntrega/hooks';
 import { colors, radius, spacing } from '@/theme/tokens';
 
 import type { PedidoFeito } from './api';
@@ -123,13 +126,16 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
   const { titulo, texto } = cabecalho(p);
   const prazo = p.status === 'aguardando_dono' ? p.prazo_resposta_em : p.status === 'aguardando_pix' ? p.pix_expira_em : null;
   const veiculo = p.veiculo ? [p.veiculo.modelo, p.veiculo.porte].filter(Boolean).join(' · ') : '—';
+  // Vaga não entregue (backend D78): só quem fez o pedido avisa; a janela o backend confere.
+  const aviso = useAviso('feito', p.id, p.feito_por_mim && podeTerAviso(p.status));
+  const podeAvisarAgora = p.feito_por_mim && podeAvisar(p.status) && aviso.isSuccess && aviso.data === null;
 
   return (
     <Screen
       edges={['bottom']}
       footer={
         // Só quem fez o pedido cancela (backend D82); os outros moradores só acompanham.
-        p.feito_por_mim && podeCancelar(p.status) ? (
+        p.feito_por_mim && podeCancelar(p.status) && !avisoAberto(aviso.data) ? (
           confirmando ? (
             <>
               <AppText variant="small" tone="muted">
@@ -170,6 +176,15 @@ function Pedido({ pedido: p }: { pedido: PedidoFeito }) {
       ) : null}
 
       {texto ? <AppText tone="muted">{texto}</AppText> : null}
+
+      {aviso.data ? <AvisoLocatarioCard aviso={aviso.data} /> : null}
+      {podeAvisarAgora ? (
+        <Button
+          variant="secondary"
+          label="A vaga não estava livre"
+          onPress={() => router.push({ pathname: '/nao-entregue/[id]', params: { id: p.id } })}
+        />
+      ) : null}
 
       {p.status === 'aguardando_pix' && p.pix_copia_cola ? (
         <View style={styles.pix}>
