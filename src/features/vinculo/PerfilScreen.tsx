@@ -35,6 +35,9 @@ export function PerfilScreen() {
           onPress={() => router.push('/escolher-vinculo')}
         />
       ) : null}
+      {vinculo.papel === 'responsavel' ? (
+        <Button label="Minha unidade" onPress={() => router.push('/minha-unidade')} />
+      ) : null}
       <Button variant="ghost" label="Aceitar outro convite" onPress={() => router.push('/aceitar-convite')} />
       <Button variant="ghost" label="Sair" onPress={() => void session.signOut()} />
     </Screen>
