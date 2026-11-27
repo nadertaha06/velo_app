@@ -443,3 +443,15 @@ nunca é mostrado.
 - O `DELETE /me` do backend passou a responder `202` com
   `{"status": "anonimizada" | "exclusao_pendente"}` (D97 dele). O app ainda não
   usa essa rota (Perfil, etapa 4).
+
+### D30. Cliente da `main` do backend, excluir conta e reembolso não aprovado
+- `schema.d.ts` gerado da `main` do backend (2ee59fb); `check:api-drift` com
+  `BACKEND_REF=main` dá ok. Fecha a D29.
+- **Excluir conta** (Perfil › Excluir conta): senha atual e a caixa "Entendi que não
+  dá para desfazer". O `DELETE /me` responde `202` (D97 do backend) com
+  `anonimizada` ou `exclusao_pendente`; nos dois casos o app sai (apaga o refresh
+  token e o cache inteiro) e o login mostra a mensagem certa uma vez: dados
+  apagados, ou "a conta foi desligada e os dados são apagados quando o reembolso
+  terminar". Senha errada e o 409 de reserva em andamento aparecem como erro.
+- `estorno_status` ganhou `nao_aprovado` (D100 do backend): "O reembolso de R$ X
+  não foi aprovado pela equipe do Velo", e o badge "Reembolso não aprovado".
