@@ -26,6 +26,13 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Velo usa suas fotos só para anunciar a vaga ou avisar que ela não estava livre.",
+          "cameraPermission": "O Velo usa a câmera só para fotografar a vaga."
+        }
       ]
     ],
     "experiments": {
