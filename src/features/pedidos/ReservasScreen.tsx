@@ -108,6 +108,11 @@ function ItemPedido({ pedido: p }: { pedido: PedidoFeito }) {
       <AppText variant="small" weight={600}>
         {formatCents(p.total_centavos)}
       </AppText>
+      {p.aviso_nao_entregue_aberto ? (
+        <AppText variant="small" tone="muted">
+          Aviso de vaga não entregue em andamento
+        </AppText>
+      ) : null}
       {p.estorno_status ? (
         <AppText variant="small" tone="muted">
           {estornoBadge[p.estorno_status]}

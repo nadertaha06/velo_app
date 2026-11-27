@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { userMessage } from '@/api/errors';
 import { AppText } from '@/components/AppText';
@@ -22,8 +22,9 @@ import { locatarioTexto } from './RecebidoScreen';
 /** Pedidos da vaga da unidade (só o responsável vê esta aba). Os que esperam resposta vêm antes. */
 export function RecebidosScreen() {
   const pedidos = useRecebidos();
-  const aguardando = pedidos.data?.filter((p) => p.status === 'aguardando_dono') ?? [];
-  const outros = pedidos.data?.filter((p) => p.status !== 'aguardando_dono') ?? [];
+  // Esperando o dono: pedido novo ou aviso de vaga não entregue com prazo (backend D98).
+  const aguardando = pedidos.data?.filter(esperaResposta) ?? [];
+  const outros = pedidos.data?.filter((p) => !esperaResposta(p)) ?? [];
   return (
     <Screen
       title="Pedidos recebidos"
@@ -64,16 +65,34 @@ export function RecebidosScreen() {
   );
 }
 
+export function esperaResposta(p: Pick<PedidoRecebido, 'status' | 'aviso_prazo_ate'>): boolean {
+  return p.status === 'aguardando_dono' || p.aviso_prazo_ate != null;
+}
+
 function Item({ pedido: p }: { pedido: PedidoRecebido }) {
   const novo = p.status === 'aguardando_dono';
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${locatarioTexto(p)}. ${vagaTitulo(p.vaga)}. ${novo ? 'Novo pedido' : statusLabel(p.status)}. ${formatPeriod(p.inicio, p.fim)}`}
+      accessibilityLabel={[
+        locatarioTexto(p),
+        vagaTitulo(p.vaga),
+        novo ? 'Novo pedido' : statusLabel(p.status),
+        p.aviso_nao_entregue_aberto ? 'Aviso de vaga não entregue' : null,
+        formatPeriod(p.inicio, p.fim),
+      ]
+        .filter(Boolean)
+        .join('. ')}
       onPress={() => router.push({ pathname: '/recebido/[id]', params: { id: p.id } })}
       style={({ pressed }) => [styles.item, pressed && styles.pressed]}
     >
-      <Badge label={novo ? 'Novo pedido' : statusLabel(p.status)} tone={statusTone(p.status)} />
+      <View style={styles.badges}>
+        <Badge label={novo ? 'Novo pedido' : statusLabel(p.status)} tone={statusTone(p.status)} />
+        {p.aviso_nao_entregue_aberto ? (
+          <Badge label={p.aviso_prazo_ate ? 'Vaga não entregue · responda' : 'Vaga não entregue · em análise'} tone="danger" />
+        ) : null}
+      </View>
+      {p.aviso_prazo_ate ? <Countdown ate={p.aviso_prazo_ate} now={serverNow} /> : null}
       <AppText weight={700}>{locatarioTexto(p)}</AppText>
       <AppText variant="small" tone="muted">
         {vagaTitulo(p.vaga)} · {formatPeriod(p.inicio, p.fim)}
@@ -94,4 +113,5 @@ function Item({ pedido: p }: { pedido: PedidoRecebido }) {
 const styles = StyleSheet.create({
   item: { backgroundColor: colors.surface, borderRadius: radius.card, padding: spacing.lg, gap: spacing.xs },
   pressed: { opacity: 0.85 },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

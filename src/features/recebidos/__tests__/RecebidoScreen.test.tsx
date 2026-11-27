@@ -41,6 +41,8 @@ const base: PedidoRecebido = {
   cancelado_por: null,
   reembolso_centavos: null,
   estorno_status: null,
+  aviso_nao_entregue_aberto: false,
+  aviso_prazo_ate: null,
   locatario: { primeiro_nome: 'Júlia', bloco: 'A', numero: '301' },
 };
 

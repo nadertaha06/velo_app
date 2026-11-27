@@ -46,6 +46,8 @@ const base: PedidoFeito = {
   cancelado_por: null,
   reembolso_centavos: null,
   estorno_status: null,
+  aviso_nao_entregue_aberto: false,
+  aviso_prazo_ate: null,
   feito_por_mim: true,
   dono: { primeiro_nome: 'Rafael', bloco: 'A', numero: '112' },
   pix_copia_cola: null,
